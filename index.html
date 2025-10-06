@@ -1130,11 +1130,30 @@
                     <div class="head"><i class="fas fa-user"></i> Head: Sanjay Singh</div>
                 </div>
                 <div class="modal-body">
-                    <div class="stat-card">
-                        <h4>Boulder Dispatch Planning for October 2025</h4>
-                        <div class="stat-value">103,040 MT</div>
-                        <div class="stat-desc">Monthly Target for Plant</div>
-
+                    <h4>Boulder Dispatch Planning</h4>
+                    
+                    <div class="month-tabs">
+                        <div class="month-tab active" onclick="switchBoulderMonth('boulder-october', this)">October</div>
+                        <div class="month-tab" onclick="switchBoulderMonth('boulder-november', this)">November</div>
+                        <div class="month-tab" onclick="switchBoulderMonth('boulder-december', this)">December</div>
+                    </div>
+                    
+                    <div id="boulder-october" class="month-content active">
+                        <h4>October Boulder Dispatch Plan</h4>
+                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER%20-%20OCT.jpeg" alt="October Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">October Boulder Dispatch Planning</p>
+                    </div>
+                    
+                    <div id="boulder-november" class="month-content">
+                        <h4>November Boulder Dispatch Plan</h4>
+                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER%20-%20NOV.jpeg" alt="November Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">November Boulder Dispatch Planning</p>
+                    </div>
+                    
+                    <div id="boulder-december" class="month-content">
+                        <h4>December Boulder Dispatch Plan</h4>
+                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER-%20DEC.jpeg" alt="December Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">December Boulder Dispatch Planning</p>
                     </div>
                     
                     <h4>Key Performance Metrics</h4>
@@ -1400,6 +1419,30 @@
                 <div class="modal-body">
                     <h4>Billing & Payables Management</h4>
                     
+                    <div class="month-tabs">
+                        <div class="month-tab active" onclick="switchPayablesMonth('payables-october', this)">October</div>
+                        <div class="month-tab" onclick="switchPayablesMonth('payables-november', this)">November</div>
+                        <div class="month-tab" onclick="switchPayablesMonth('payables-december', this)">December</div>
+                    </div>
+                    
+                    <div id="payables-october" class="month-content active">
+                        <h4>October Billing & Payables Plan</h4>
+                        <img src="https://via.placeholder.com/800x600/2c3e50/ffffff?text=October+Billing+Plan" alt="October Billing Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">October Billing & Payables Planning</p>
+                    </div>
+                    
+                    <div id="payables-november" class="month-content">
+                        <h4>November Billing & Payables Plan</h4>
+                        <img src="https://via.placeholder.com/800x600/4a6491/ffffff?text=November+Billing+Plan" alt="November Billing Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">November Billing & Payables Planning</p>
+                    </div>
+                    
+                    <div id="payables-december" class="month-content">
+                        <h4>December Billing & Payables Plan</h4>
+                        <img src="https://via.placeholder.com/800x600/3498db/ffffff?text=December+Billing+Plan" alt="December Billing Plan" class="month-image" onclick="zoomImage(this.src)">
+                        <p class="image-caption">December Billing & Payables Planning</p>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -1412,7 +1455,30 @@
                     <h2><i class="fas fa-chart-network"></i> Business Expansion</h2>
                 </div>
                 <div class="modal-body">
-                  
+                    <h4>Strategic Business Expansion Plan</h4>
+                    <ul>
+                        <li>Market Analysis and Identification of Growth Opportunities</li>
+                        <li>Diversification into New Product Lines</li>
+                        <li>Geographical Expansion to New Markets</li>
+                        <li>Strategic Partnerships and Acquisitions</li>
+                        <li>Investment in Research and Development</li>
+                        <li>Capacity Enhancement and Infrastructure Development</li>
+                    </ul>
+                    
+                    <h4>Expansion Timeline</h4>
+                    <ul>
+                        <li>Phase 1 (Oct 2025): Market Research and Feasibility Studies</li>
+                        <li>Phase 2 (Nov 2025): Resource Allocation and Planning</li>
+                        <li>Phase 3 (Dec 2025): Implementation and Execution</li>
+                    </ul>
+                    
+                    <h4>Key Performance Indicators</h4>
+                    <ul>
+                        <li>Market Share Growth: Target 15% increase in 90 days</li>
+                        <li>Revenue from New Markets: Target 20% of total revenue</li>
+                        <li>Customer Base Expansion: Target 25% growth</li>
+                        <li>Operational Efficiency: Target 10% improvement</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -1503,7 +1569,32 @@
                 <div class="modal-header">
                     <h2><i class="fas fa-plus-circle"></i> Extra</h2>
                 </div>
-                
+                <div class="modal-body">
+                    <h4>Additional Initiatives and Special Projects</h4>
+                    <ul>
+                        <li>Employee Training and Development Programs</li>
+                        <li>Safety Enhancement Measures</li>
+                        <li>Technology Upgradation and Digital Transformation</li>
+                        <li>Sustainability and Environmental Initiatives</li>
+                        <li>Community Engagement and CSR Activities</li>
+                        <li>Quality Assurance and Process Improvement</li>
+                    </ul>
+                    
+                    <h4>Special Projects Timeline</h4>
+                    <ul>
+                        <li>Project A: Employee Skill Enhancement (October 2025)</li>
+                        <li>Project B: Safety Protocol Implementation (November 2025)</li>
+                        <li>Project C: Digital Infrastructure Upgrade (December 2025)</li>
+                    </ul>
+                    
+                    <h4>Key Objectives</h4>
+                    <ul>
+                        <li>Enhance Operational Efficiency by 15%</li>
+                        <li>Reduce Safety Incidents by 25%</li>
+                        <li>Improve Employee Satisfaction Scores by 20%</li>
+                        <li>Increase Digital Process Adoption by 30%</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
@@ -1833,6 +1924,36 @@
             // Add active class to clicked tab and corresponding content
             tabElement.classList.add('active');
             document.getElementById(monthId).classList.add('active');
+        }
+        
+        // Boulder Transport month content switching
+        function switchBoulderMonth(contentId, tabElement) {
+            // Get all tabs and contents in the boulder modal
+            const tabs = document.querySelectorAll('#weighbridgeModal .month-tab');
+            const contents = document.querySelectorAll('#weighbridgeModal .month-content');
+            
+            // Remove active class from all tabs and contents
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tabElement.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
+        }
+        
+        // Payables month content switching
+        function switchPayablesMonth(contentId, tabElement) {
+            // Get all tabs and contents in the payables modal
+            const tabs = document.querySelectorAll('#payablesModal .month-tab');
+            const contents = document.querySelectorAll('#payablesModal .month-content');
+            
+            // Remove active class from all tabs and contents
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tabElement.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
         }
         
         // Plant operations content switching
