@@ -3,1953 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision - 25/26 -> 90 Days Planning - SGX Minerals Pvt Ltd</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Vehicle Tracking System with Twilio WhatsApp</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #f8f9fa;
-            --dark: #2c3e50;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --info: #17a2b8;
-            --gray: #95a5a6;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-            --shadow-3d: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
-            color: #333;
-            line-height: 1.6;
-            position: relative;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            perspective: 1000px;
-            cursor: pointer;
+            padding: 20px;
         }
-        
-        .current-date {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            box-shadow: var(--shadow-3d);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transform: translateZ(20px);
-        }
-        
+
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow-3d);
-            position: relative;
-            overflow: hidden;
-            transform-style: preserve-3d;
-        }
-        
-        header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,192C1248,192,1344,128,1392,96L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .title-flow-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            border-radius: 20px;
-        }
-        
-        .title-flow-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-            height: 2px;
-            width: 0;
-            border-radius: 3px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-            animation: titleFlowAnimation 3s ease-in-out infinite;
-        }
-        
-        @keyframes titleFlowAnimation {
-            0% {
-                width: 0;
-                opacity: 0;
-                left: -10%;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                width: 120%;
-                opacity: 0;
-                left: 100%;
-            }
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            font-weight: 900;
-            position: relative;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transform: translateZ(30px);
-        }
-        
-        .company-name {
-            font-size: 1.5rem;
-            font-weight: 300;
-            opacity: 0.9;
-            position: relative;
-            transform: translateZ(20px);
-        }
-        
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .box {
             background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: var(--shadow-3d);
-            cursor: pointer;
-            transition: var(--transition);
-            border-left: 5px solid var(--primary);
-            display: flex;
-            flex-direction: column;
-            height: 180px;
-            justify-content: space-between;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
-            transform-style: preserve-3d;
         }
-        
-        .box::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-        
-        .box:hover {
-            transform: translateY(-8px) rotateX(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
-            border-left-color: var(--secondary);
-        }
-        
-        .box.active {
-            border-left-color: var(--success);
-            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
-        }
-        
-        .box h3 {
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .box .head {
-            font-size: 1rem;
-            color: var(--gray);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .view-details {
-            align-self: flex-end;
-            color: var(--secondary);
-            font-weight: 600;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: var(--transition);
-        }
-        
-        .box:hover .view-details {
-            transform: translateX(5px);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            overflow-y: auto;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 3% auto;
-            padding: 40px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 1000px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            position: relative;
-            animation: modalFade 0.4s;
-            transform-style: preserve-3d;
-        }
-        
-        @keyframes modalFade {
-            from {opacity: 0; transform: translateY(-30px) rotateX(-10deg);}
-            to {opacity: 1; transform: translateY(0) rotateX(0);}
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--gray);
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            z-index: 10;
-        }
-        
-        .close-btn:hover {
-            color: var(--accent);
-            background-color: rgba(231, 76, 60, 0.1);
-            transform: rotate(90deg);
-        }
-        
-        .modal-header {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            position: relative;
-        }
-        
-        .modal-header::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 2px;
-        }
-        
-        .modal-header h2 {
-            color: var(--primary);
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        
-        .modal-header .head {
-            color: var(--gray);
-            font-size: 1.1rem;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .modal-body h4 {
-            margin: 25px 0 15px;
-            color: var(--secondary);
-            font-size: 1.3rem;
-            font-weight: 600;
-            padding-left: 15px;
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .modal-body ul {
-            margin-left: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .modal-body li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-            position: relative;
-            padding-left: 10px;
-        }
-        
-        .modal-body li::before {
-            content: "•";
-            color: var(--secondary);
-            font-weight: bold;
-            position: absolute;
-            left: -15px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 60px;
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
             padding: 30px;
-            color: var(--gray);
-            font-size: 1rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .point-button {
-            display: block;
-            width: 100%;
-            padding: 15px 20px;
-            margin: 12px 0;
-            background-color: var(--light);
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            text-align: left;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .point-button::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .point-button:hover::before {
-            left: 100%;
-        }
-        
-        .point-button:hover {
-            background-color: #e9ecef;
-            border-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .point-button.active {
-            background-color: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-        }
-        
-        .monthly-breakdown {
-            display: none;
-            margin-top: 15px;
-            padding: 20px;
-            background-color: var(--light);
-            border-radius: 10px;
-            border-left: 4px solid var(--secondary);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .monthly-breakdown.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .month-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #dee2e6;
-            background: white;
-            border-radius: 10px;
-            padding: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        
-        .month-tab {
-            flex: 1;
-            padding: 12px 15px;
-            cursor: pointer;
-            text-align: center;
-            transition: var(--transition);
-            border-radius: 8px;
-            font-weight: 500;
-        }
-        
-        .month-tab.active {
-            background: var(--secondary);
-            color: white;
-            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
-        }
-        
-        .month-content {
-            display: none;
-        }
-        
-        .month-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .month-image {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            display: block;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid #eee;
-        }
-        
-        .month-image:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .image-caption {
-            text-align: center;
-            font-style: italic;
-            color: var(--gray);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        
-        .pattern-image-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            gap: 30px;
-            margin: 25px 0;
-        }
-        
-        .pattern-image {
-            max-width: 320px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid #eee;
-        }
-        
-        .pattern-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        .pattern-description {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 0.95rem;
-            color: #555;
-            max-width: 320px;
-        }
-        
-        .machine-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .machine-table th, .machine-table td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
             text-align: center;
         }
-        
-        .machine-table th {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-weight: 600;
-        }
-        
-        .machine-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .machine-table tr:hover {
-            background-color: #e9ecef;
-        }
-        
-        .plant-buttons, .dispatch-buttons, .revenue-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .plant-button, .dispatch-button, .revenue-button {
-            flex: 1;
-            min-width: 150px;
-            padding: 12px 20px;
-            background-color: var(--light);
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .plant-button::before, .dispatch-button::before, .revenue-button::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .plant-button:hover::before, .dispatch-button:hover::before, .revenue-button:hover::before {
-            left: 100%;
-        }
-        
-        .plant-button:hover, .dispatch-button:hover, .revenue-button:hover {
-            background-color: #e9ecef;
-            border-color: var(--secondary);
-        }
-        
-        .plant-button.active, .dispatch-button.active, .revenue-button.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-color: var(--secondary);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-        }
-        
-        .image-zoom-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .zoomed-image {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
-        }
-        
-        .close-zoom {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .close-zoom:hover {
-            color: var(--accent);
-            background-color: rgba(231, 76, 60, 0.2);
-            transform: rotate(90deg);
-        }
-        
-        .manpower-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .manpower-table th, .manpower-table td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            text-align: center;
-        }
-        
-        .manpower-table th {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-weight: 600;
-        }
-        
-        .manpower-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .manpower-table tr:hover {
-            background-color: #e9ecef;
-        }
-        
-        .pdf-container {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .pdf-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .stat-card h4 {
-            color: var(--primary);
+
+        .header h1 {
+            font-size: 2.5em;
             margin-bottom: 10px;
-            font-size: 1.2rem;
         }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin: 10px 0;
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
         }
-        
-        .stat-desc {
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            border-radius: 5px;
-            transition: width 1s ease;
-        }
-        
-        .mine-image {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            display: block;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid #eee;
-        }
-        
-        /* Green line flow effect */
-        .green-flow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-        
-        .flow-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, var(--success), transparent);
-            height: 3px;
-            width: 0;
-            border-radius: 3px;
-            box-shadow: 0 0 10px var(--success);
-            animation: flowAnimation 1.5s ease-out forwards;
-        }
-        
-        @keyframes flowAnimation {
-            0% {
-                width: 0;
-                opacity: 1;
-            }
-            100% {
-                width: 100%;
-                opacity: 0;
-            }
-        }
-        
-        /* Random color scheme variables */
-        .color-transition {
-            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
-        }
-        
-        @media (max-width: 1200px) {
-            .dashboard {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (max-width: 992px) {
-            .dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .company-name {
-                font-size: 1.2rem;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 5% auto;
-                padding: 30px;
-            }
-        }
-        
+
         @media (max-width: 768px) {
-            .dashboard {
+            .content {
                 grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .company-name {
-                font-size: 1rem;
-            }
-            
-            .modal-content {
-                padding: 25px;
-            }
-            
-            .month-tabs {
-                flex-direction: column;
-            }
-            
-            .month-tab {
-                padding: 15px;
-                border-bottom: 1px solid #dee2e6;
-            }
-            
-            .month-tab.active {
-                border-left: 4px solid var(--secondary);
-                border-bottom: 1px solid #dee2e6;
-            }
-            
-            .month-image, .pattern-image {
-                max-width: 100%;
-            }
-            
-            .pattern-image-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .current-date {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 20px;
-                text-align: center;
-                justify-content: center;
-            }
-            
-            .plant-buttons, .dispatch-buttons, .revenue-buttons {
-                flex-direction: column;
-            }
-            
-            .machine-table, .manpower-table {
-                font-size: 0.85rem;
-            }
-            
-            .machine-table th, .machine-table td,
-            .manpower-table th, .manpower-table td {
-                padding: 8px 10px;
-            }
-            
-            .pdf-container {
-                height: 400px;
             }
         }
-        
-        @media (max-width: 576px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .pdf-container {
-                height: 300px;
-            }
-            
-            .box {
-                height: 160px;
-                padding: 20px;
-            }
-            
-            .box h3 {
-                font-size: 1.3rem;
-            }
-            
-            .modal-content {
-                padding: 20px;
-            }
-            
-            .modal-header h2 {
-                font-size: 1.7rem;
-            }
+
+        .form-section, .data-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            text-align: left;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        .status-in { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; }
+        .status-out { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .config-section {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .twilio-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .twilio-connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .twilio-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
-    <div class="current-date" id="currentDate">
-        <i class="fas fa-calendar-alt"></i>
-        <span id="dateText"></span>
-    </div>
-    
-    <!-- Green flow line container -->
-    <div class="green-flow" id="greenFlow"></div>
-    
     <div class="container">
-        <header>
-            <div class="title-flow-container" id="titleFlowContainer"></div>
-            <h1>Vision - 25/26 -> 90 Days Planning To Achieve 230 TPH</h1>
-            <div class="company-name">SGX Minerals Pvt Ltd</div>
-        </header>
-        
-        <div class="dashboard">
-            <!-- Row 1 -->
-            <div class="box" onclick="openModal('mineModal', this)">
-                <div>
-                    <h3><i class="fas fa-mountain"></i> Mine Operations</h3>
-                    <div class="head"><i class="fas fa-user"></i> Head: K. Siva Prasada Rao</div>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('weighbridgeModal', this)">
-                <div>
-                    <h3><i class="fas fa-truck-loading"></i> Boulder Transport</h3>
-                    <div class="head"><i class="fas fa-user"></i> Head: Sanjay Singh</div>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('plantModal', this)">
-                <div>
-                    <h3><i class="fas fa-industry"></i> Plant Operations</h3>
-                    <div class="head"><i class="fas fa-user"></i> Head: G. Shyam Prasad</div>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('equipmentModal', this)">
-                <div>
-                    <h3><i class="fas fa-tools"></i> Equipment & Maintenance</h3>
-                    <div class="head"><i class="fas fa-user"></i> Head: T. Loknath Reddy</div>
-                </div>
-            </div>
-            
-            <!-- Row 2 -->
-            <div class="box" onclick="openModal('dispatchModal', this)">
-                <div>
-                    <h3><i class="fas fa-shipping-fast"></i> Dispatch</h3>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('revenueModal', this)">
-                <div>
-                    <h3><i class="fas fa-chart-line"></i> Revenue</h3>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('payablesModal', this)">
-                <div>
-                    <h3><i class="fas fa-file-invoice-dollar"></i> Billing, Payables & ERP</h3>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('businessModal', this)">
-                <div>
-                    <h3><i class="fas fa-chart-network"></i> Business Expansion</h3>
-                </div>
-            </div>
-            
-            <!-- Row 3 -->
-            <div class="box" onclick="openModal('stockModal', this)">
-                <div>
-                    <h3><i class="fas fa-boxes"></i> Stock Management</h3>
-                </div>
-                <div class="view-details">View Details <i class="fas fa-arrow-right"></i></div>
-            </div>
-            
-            <div class="box" onclick="openModal('strategyModal', this)">
-                <div>
-                    <h3><i class="fas fa-chess-knight"></i>Development Works</h3>
-                <div class="view-details">View Details <i class="fas fa-arrow-right"></i></div>
-                </div>
-            </div>
-            
-            <div class="box" onclick="openModal('compliancesModal', this)">
-                <div>
-                    <h3><i class="fas fa-clipboard-check"></i> Compliances</h3>
-                </div>
-                <div class="view-details">View Details <i class="fas fa-arrow-right"></i></div>
-            </div>
-            
-            <div class="box" onclick="openModal('extraModal', this)">
-                <div>
-                    <h3><i class="fas fa-plus-circle"></i>Manpower Management</h3>
-                </div>
-                <div class="view-details">View Details <i class="fas fa-arrow-right"></i></div>
-            </div>
+        <div class="header">
+            <h1>🚚 Vehicle Tracking with Twilio WhatsApp</h1>
+            <p>Automated WhatsApp notifications using Twilio API</p>
         </div>
 
-        <!-- Image Zoom Modal -->
-        <div id="imageZoomModal" class="image-zoom-modal">
-            <span class="close-zoom" onclick="closeZoomModal()">&times;</span>
-            <img id="zoomedImg" class="zoomed-image" src="" alt="Zoomed Image">
-        </div>
-        
+        <div class="content">
+            <div class="form-section">
+                <!-- Twilio Configuration -->
+                <div class="config-section">
+                    <h3>🔧 Twilio Configuration</h3>
+                    <div class="form-group">
+                        <label for="accountSID">Account SID</label>
+                        <input type="text" id="accountSID" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label for="authToken">Auth Token</label>
+                        <input type="password" id="authToken" placeholder="Your Twilio Auth Token">
+                    </div>
+                    <div class="form-group">
+                        <label for="twilioNumber">Twilio WhatsApp Number</label>
+                        <input type="text" id="twilioNumber" placeholder="whatsapp:+14155238886" value="whatsapp:+14155238886">
+                    </div>
+                    <div class="form-group">
+                        <label for="toNumber">Recipient WhatsApp Number</label>
+                        <input type="text" id="toNumber" placeholder="whatsapp:+919876543210">
+                    </div>
+                    <button class="btn btn-primary" onclick="testTwilioConnection()">Test Twilio Connection</button>
+                    <div id="twilioStatus" class="twilio-status"></div>
+                </div>
 
-        <!-- Modal for Mine Operations -->
-        <div id="mineModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('mineModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-mountain"></i> Mine Operations</h2>
-                    <div class="head"><i class="fas fa-user"></i> Head: K. Siva Prasada Rao</div>
+                <h3>📝 Vehicle Entry Form</h3>
+                <div id="message"></div>
+
+                <div class="form-group">
+                    <label for="vehicleNumber">Vehicle Number *</label>
+                    <input type="text" id="vehicleNumber" placeholder="e.g., KA01AB1234" required>
                 </div>
-                <div class="modal-body">
-                    
-                    <button class="point-button" onclick="toggleBreakdown(event, 'target-breakdown')">
-                        1. Target for 90,000 Production
-                    </button>
-                    <div id="target-breakdown" class="monthly-breakdown">
-                        <div class="month-tabs">
-                            <div class="month-tab active" onclick="switchMonth('target-october', this)">October</div>
-                            <div class="month-tab" onclick="switchMonth('target-november', this)">November</div>
-                            <div class="month-tab" onclick="switchMonth('target-december', this)">December</div>
-                        </div>
-                        <div id="target-october" class="month-content active">                            
-                            <!-- October Image -->
-                            <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/MINE-OCT.jpeg" alt="October Production Plan" class="month-image" onclick="zoomImage(this.src)">
-                            <p class="image-caption">October Production Plan</p>
-                        </div>
-                        <div id="target-november" class="month-content">                  
-                            <!-- November Image -->
-                            <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/MINE-NOV.jpeg" alt="November Production Plan" class="month-image" onclick="zoomImage(this.src)">
-                            <p class="image-caption">November Production Plan</p>
-                        </div>
-                        <div id="target-december" class="month-content">
-                            <!-- December Image -->
-                            <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/MINE-DEC.jpeg" alt="December Production Plan" class="month-image" onclick="zoomImage(this.src)">
-                            <p class="image-caption">December Production Plan</p>
-                        </div>
-                    </div>
-                    
-                    <button class="point-button" onclick="toggleBreakdown(event, 'bench-breakdown')">
-                        2. Bench Development
-                    </button>
-                    <div id="bench-breakdown" class="monthly-breakdown">
-                        <h4>Bench Development Plan</h4>
-                        <ul>
-                            <li>Development of new benches to increase production capacity</li>
-                            <li>Systematic planning for bench height and width optimization</li>
-                            <li>Regular monitoring of bench stability and safety measures</li>
-                            <li>Implementation of proper drainage systems for each bench</li>
-                        </ul>
-                    </div>
-                    
-                    <button class="point-button" onclick="toggleBreakdown(event, 'pattern-breakdown')">
-                        3. Blasting Patterns
-                    </button>
-                    <div id="pattern-breakdown" class="monthly-breakdown">
-                        <div class="pattern-image-container">
-                            <div>
-                                <h4>Staggered Pattern</h4>
-                                <p class="pattern-description">Optimized for better fragmentation and reduced vibration</p>
-                            </div>
-                            <div>
-                                <h4>Rectangular / In-line Pattern</h4>
-                                <p class="pattern-description">Standard pattern for consistent results in uniform rock formations</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="point-button" onclick="toggleBreakdown(event, 'machines-breakdown')">
-                        4. Requirements of Machines
-                    </button>
-                    <div id="machines-breakdown" class="monthly-breakdown">
-                        <h4>Machine Requirements vs Actual Availability</h4>
-                        <table class="machine-table">
-                            <thead>
-                                <tr>
-                                    <th>Machine Name</th>
-                                    <th>Requirement</th>
-                                    <th>Actual</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Excavator for Loading</td>
-                                    <td>2</td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>Excavator for Breaking</td>
-                                    <td>2</td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>Dozer</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>Tippers for Boulder Loading</td>
-                                    <td>10</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <td>Tippers for Development</td>
-                                    <td>2</td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>Excavator for Development</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <button class="point-button" onclick="toggleBreakdown(event, 'cost-breakdown')">
-                        5. Cost Control Objectives
-                    </button>
-                    <div id="cost-breakdown" class="monthly-breakdown">
-                        <h4>Cost Control Measures</h4>
-                        <ul>
-                            <li>Hole to hole spacing is increased</li>
-                            <li>Power gel utilization is reduced in holes</li>
-                            <li>Reducing boulder breaking</li>
-                            <li>Blaster payment reduced</li>
-                        </ul>
-                    </div>
+
+                <div class="form-group">
+                    <label for="tonnage">Tonnage (tons) *</label>
+                    <input type="number" id="tonnage" placeholder="e.g., 10" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="intime">Intime *</label>
+                    <input type="datetime-local" id="intime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="outtime">Outtime</label>
+                    <input type="datetime-local" id="outtime">
+                </div>
+
+                <div class="form-group">
+                    <label for="customMessage">Custom WhatsApp Message (Optional)</label>
+                    <textarea id="customMessage" rows="3" placeholder="Add custom message or leave empty for default"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveVehicle()">Save Vehicle Entry</button>
+                    <button class="btn btn-success" onclick="setOuttimeAndSendWhatsApp()">Set Outtime & Send WhatsApp</button>
+                    <button class="btn btn-warning" onclick="clearForm()">Clear Form</button>
                 </div>
             </div>
-        </div>
-        
-        <!-- Boulder Weighbridge Modal -->
-        <div id="weighbridgeModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('weighbridgeModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-truck-loading"></i> Boulder Transport</h2>
-                    <div class="head"><i class="fas fa-user"></i> Head: Sanjay Singh</div>
-                </div>
-                <div class="modal-body">
-                    <h4>Boulder Dispatch Planning</h4>
-                    
-                    <div class="month-tabs">
-                        <div class="month-tab active" onclick="switchBoulderMonth('boulder-october', this)">October</div>
-                        <div class="month-tab" onclick="switchBoulderMonth('boulder-november', this)">November</div>
-                        <div class="month-tab" onclick="switchBoulderMonth('boulder-december', this)">December</div>
-                    </div>
-                    
-                    <div id="boulder-october" class="month-content active">
-                        <h4>October Boulder Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER%20-%20OCT.jpeg" alt="October Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">October Boulder Dispatch Planning</p>
-                    </div>
-                    
-                    <div id="boulder-november" class="month-content">
-                        <h4>November Boulder Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER%20-%20NOV.jpeg" alt="November Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">November Boulder Dispatch Planning</p>
-                    </div>
-                    
-                    <div id="boulder-december" class="month-content">
-                        <h4>December Boulder Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/BOULDER-%20DEC.jpeg" alt="December Boulder Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">December Boulder Dispatch Planning</p>
-                    </div>
-                    
-                    <h4>Requirement of Machines</h4>
-                    <ul>
-                        <li>100% Availability of 10 Tippers for 18 hours per day.</li>
-                        <li>100% Availability of Loaders & Excavators</li>
-                    </ul>
-                    
-                    <h4>Mine Road Development</h4>
-                    <ul>
-                        <li>Regular maintenance of existing roads</li>
-                        <li>Installation of proper trench systems for water flow</li>
-                    </ul>
-                    
-                    <h4>Supporting Team</h4>
-                    <ul>
-                        <li>Quarry: Bijay & JayPrakash</li>
-                        <li>Crusher: Narendra, Gaurav & Prasad</li>
-                        <li>Maintenance: Ravi & Amit</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Plant Operations Modal -->
-        <div id="plantModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('plantModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-industry"></i> Plant Operations</h2>
-                    <div class="head"><i class="fas fa-user"></i> Head: G. Shyam Prasad</div>
-                </div>
-                <div class="modal-body">
-                    <div class="stat-card">
-                        <h4>Plant Capacity</h4>
-                        <div class="stat-value">250 TPH</div>
-                        <div class="stat-desc">Maximum production capacity</div>
-                    </div>
-                    
-                    <h4>Maintenance Schedule</h4>
-                    <ul>
-                        <li>Daily Maintenance - 8 AM - 11 AM</li>
-                    </ul>
-                    
-                    <div class="plant-buttons">
-                        <div class="plant-button active" onclick="switchPlantContent('plant-planning', this)">Plant Planning</div>
-                        <div class="plant-button" onclick="switchPlantContent('plant-running', this)">Plant Running Time</div>
-                    </div>
-                    
-                    <div id="plant-planning" class="month-content active">
-                        <h4>Plant Planning</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Plant%20_operation.jpeg" alt="Plant Planning" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Plant Planning Diagram</p>
-                    </div>
-                    
-                    <div id="plant-running" class="month-content">
-                        <h4>Plant Running Time</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/90_Days_Work_Vision/main/plant-%20running%20hrs.jpg" alt="Plant Running Time" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Plant Running Time Schedule</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Equipment Modal -->
-        <div id="equipmentModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('equipmentModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-tools"></i> Equipment Management</h2>
-                    <div class="head"><i class="fas fa-user"></i> Head: T. Loknath Reddy</div>
-                </div>
-                <div class="modal-body">
-                    <h4>Tippers</h4>
-                    <ul>
-                        <li>100% Availability</li>
-                        <li>3744 MT Boulder Transport Quarry to Plant</li>
-                    </ul>
-                    
-                    <h4>Machinery Availability</h4>
-                    <ul>
-                        <li>18 Hrs Availability of 2 Excavators & 2 Loaders</li>
-                    </ul>
-                    
-                    <h4>Reduce Idle Hours</h4>
-                    <ul>
-                        <li>Tipper Movement Proper Management</li>
-                        <li>Tipper No wait in the Boulder feeder</li>
-                    </ul>
-                    
-                    <h4>Cost Control & Objectives</h4>
-                    <ul>
-                        <li>Road Maintenance properly</li>
-                        <li>In House team for Tipper works</li>
-                        <li>AdBlue bypass for warranty vehicles</li>
-                    </ul>
-                    
-                    <h4>Requirement & Existing of Manpower</h4>
-                    <table class="manpower-table">
+
+            <div class="data-section">
+                <h3>📊 Vehicle Records</h3>
+                <div class="table-container">
+                    <table>
                         <thead>
                             <tr>
-                                <th>Position</th>
-                                <th>Requirement</th>
-                                <th>Actual</th>
+                                <th>Vehicle No</th>
+                                <th>Tonnage</th>
+                                <th>Intime</th>
+                                <th>Outtime</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Tipper Drivers</td>
-                                <td>26</td>
-                                <td>20</td>
-                            </tr>
-                            <tr>
-                                <td>Helpers</td>
-                                <td>10</td>
-                                <td>8</td>
-                            </tr>
-                            <tr>
-                                <td>Machine Operators</td>
-                                <td>5</td>
-                                <td>4</td>
-                            </tr>
-                            <tr>
-                                <td>Loader Operators</td>
-                                <td>4</td>
-                                <td>4</td>
-                            </tr>
+                        <tbody id="vehicleTableBody">
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Dispatch Modal -->
-        <div id="dispatchModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('dispatchModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-shipping-fast"></i> Dispatch Operations</h2>
-                    <div class="head"><i class="fas fa-users"></i> Head: Weighbridge Team</div>
-                </div>
-                <div class="modal-body">
-                    <h4>Dispatch Planning</h4>
-                    
-                    <div class="dispatch-buttons">
-                        <div class="dispatch-button active" onclick="switchDispatchMonth('dispatch-october', this)">October Planning</div>
-                        <div class="dispatch-button" onclick="switchDispatchMonth('dispatch-november', this)">November Planning</div>
-                        <div class="dispatch-button" onclick="switchDispatchMonth('dispatch-december', this)">December Planning</div>
-                    </div>
-                    
-                    <div id="dispatch-october" class="month-content active">
-                        <h4>October Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Dispatch%20-%20OCT.jpeg" alt="October Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">October Dispatch Planning</p>
-                    </div>
-                    
-                    <div id="dispatch-november" class="month-content">
-                        <h4>November Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Dispatch-%20NOV.jpeg" alt="November Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">November Dispatch Planning</p>
-                    </div>
-                    
-                    <div id="dispatch-december" class="month-content">
-                        <h4>December Dispatch Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Dispatch%20-%20DEC.jpeg" alt="December Dispatch Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">December Dispatch Planning</p>
-                    </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-warning" onclick="exportData()">Export Data</button>
+                    <button class="btn" onclick="clearAllData()" style="background: #e74c3c; color: white;">Clear All Data</button>
                 </div>
             </div>
         </div>
-        
-        <!-- Revenue Modal -->
-        <div id="revenueModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('revenueModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-chart-line"></i> Revenue</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>Revenue Planning</h4>
-                    
-                    <div class="revenue-buttons">
-                        <div class="revenue-button active" onclick="switchRevenueMonth('revenue-october', this)">October</div>
-                        <div class="revenue-button" onclick="switchRevenueMonth('revenue-november', this)">November</div>
-                        <div class="revenue-button" onclick="switchRevenueMonth('revenue-december', this)">December</div>
-                        <div class="revenue-button" onclick="switchRevenueMonth('basic-rates', this)">Basic Rates</div>
-                        <div class="revenue-button" onclick="switchRevenueMonth('rates-po', this)">Rates per PO</div>
-                    </div>
-                    
-                    <div id="revenue-october" class="month-content active">
-                        <h4>October Revenue Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/TOTAL%20REVENUE%20-%20OCT.jpeg" alt="October Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Total Revenue Planning</p>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/BASIC%20REVENUE%20-%20OCT.jpeg" alt="October Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Basic Revenue Planning</p>
-                    </div>
-                    
-                    <div id="revenue-november" class="month-content">
-                        <h4>November Revenue Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/BASIC%20REVENUE%20-%20NOV.jpeg" alt="November Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Total Revenue Planning</p>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/TOTAL%20REVENUE%20-%20NOV.jpeg" alt="November Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Basic Revenue Planning</p>
-                    </div>
-                    
-                    <div id="revenue-december" class="month-content">
-                        <h4>December Revenue Plan</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/TOTAL%20REVENUE%20-%20DEC.jpeg" alt="December Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Total Revenue Planning</p>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/BASIC%20%20REVENUE%20-%20DEC.jpeg" alt="December Revenue Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Basic Revenue Planning</p>
-                    </div>
-                    
-                    <div id="basic-rates" class="month-content">
-                        <h4>Basic Rates</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/CUSTOMER%20-%20BASIC%20RATES.jpeg" alt="Basic Rates" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Basic Rates Information</p>
-                    </div>
-                    
-                    <div id="rates-po" class="month-content">
-                        <h4>Rates per PO</h4>
-                        <img src="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/CUSTOMER%20-%20RATES%20PER%20PO.jpeg" alt="Rates per PO" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">Rates per Purchase Order</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Payables & ERP Modal -->
-        <div id="payablesModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('payablesModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-file-invoice-dollar"></i> Billing, Payables & ERP Entries</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>Billing & Payables Management</h4>
-                    
-                    <div class="month-tabs">
-                        <div class="month-tab active" onclick="switchPayablesMonth('payables-october', this)">October</div>
-                        <div class="month-tab" onclick="switchPayablesMonth('payables-november', this)">November</div>
-                        <div class="month-tab" onclick="switchPayablesMonth('payables-december', this)">December</div>
-                    </div>
-                    
-                    <div id="payables-october" class="month-content active">
-                        <h4>October Billing & Payables Plan</h4>
-                        <img src="https://via.placeholder.com/800x600/2c3e50/ffffff?text=October+Billing+Plan" alt="October Billing Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">October Billing & Payables Planning</p>
-                        <li> Daily Review Billing & Liabikities</li>
-                        <li> Ontime Bill Submit to the Customers</li>
-                        <li> Daily ERP Entries </li>
-                    </div>
-                    
-                    <div id="payables-november" class="month-content">
-                        <h4>November Billing & Payables Plan</h4>
-                        <img src="https://via.placeholder.com/800x600/4a6491/ffffff?text=November+Billing+Plan" alt="November Billing Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">November Billing & Payables Planning</p>
-                    </div>
-                    
-                    <div id="payables-december" class="month-content">
-                        <h4>December Billing & Payables Plan</h4>
-                        <img src="https://via.placeholder.com/800x600/3498db/ffffff?text=December+Billing+Plan" alt="December Billing Plan" class="month-image" onclick="zoomImage(this.src)">
-                        <p class="image-caption">December Billing & Payables Planning</p>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-        
-        <!-- Business Modal -->
-        <div id="businessModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('businessModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-chart-network"></i> Business Expansion</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>To Produce Railway Ballast Material</h4>
-                  
-                    <h4>MicroSilica Sales - Customers</h4>
-                    <ul>
-                        <li>Rithwik Engineering</li>
-                        <li>My Home</li>
-                        <li>MK Builder</li>
-                        <li>North Star</li>
-                        <li>Ultratech</li>
-                        <li>NCL</li>
-                    </ul>
-                    
-                    <h4>Railway Ballast Tender</h4>
-                    <ul>
-                        <li>Preparation of tender documents for railway ballast supply</li>
-                        <li>Market analysis for competitive pricing</li>
-                        <li>Quality assurance measures for railway specifications</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Stock Management Modal -->
-        <div id="stockModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('stockModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-boxes"></i> Stock Management</h2>
-                    <div class="head"><i class="fas fa-user"></i> Head: Stock Management</div>
-                </div>
-                <div class="modal-body">
-                    <h4>Stock Management System</h4>
-                    
-                    
-                    <h4>Stock Categories</h4>
-                    <ul>
-                        <li>Raw Materials</li>
-                        <li>Work-in-Progress</li>
-                        <li>Finished Goods</li>
-                    </ul>
-                    
-                    <h4>Stock Reporting</h4>
-                    <ul>
-                        <li>Daily stock reports for management review</li>
-                        <li>Weekly stock analysis for production planning</li>
-                        <li>Monthly stock valuation for financial reporting</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Strategy & Development Modal -->
-        <div id="strategyModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('strategyModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-chess-knight"></i> Development Works</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>New Office Construction</h4>
-                
-                    
-                    <h4>Maintenance Workshop</h4>
-                
-                    
-                    <h4>CSR Activities</h4>
-                    <ul>
-                        <li>Water Tanker Work in Villages</li>
-                        <li>Village Road Development</li>
-                        <li>Community health and education initiatives</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Compliances Modal -->
-        <div id="compliancesModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('compliancesModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-clipboard-check"></i> Compliances</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>ENVIRONMENTAL STATUTORY CHART</h4>
-                    <div class="pdf-container">
-                        <!-- Using Google Docs Viewer to display the PDF -->
-                        <iframe src="https://docs.google.com/gview?url=https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Statutory%20Chart.pdf&embedded=true" title="Environmental Statutory Chart"></iframe>
-                    </div>
-                    <p>Environmental compliance documentation for SGX Minerals Pvt Ltd.</p>
-                    <p><a href="https://raw.githubusercontent.com/bimal-bp/Work_plan/main/Statutory%20Chart.pdf" target="_blank">Download PDF</a> if the preview doesn't load properly.</p>
-                    
-                  
-                </div>
-            </div>
-        </div>
-        
-        <!-- Extra Modal -->
-        <div id="extraModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal('extraModal')">&times;</span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-plus-circle"></i> Manpower Management</h2>
-                </div>
-                <div class="modal-body">
-                    <h4>Proper Accommodation and Food System</h4>
-                  
-                    
-                    <h4>House for staying in Village and Food delivery System</h4>
-                
-                    
-                    <h4>Mess food menu improvement</h4>
-                    <h4>Improve Employee Satisfaction with Advance help to all when they need </h4>
-                    
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>SGX Minerals Pvt Ltd &copy; 2023 | 90 Days Planning Dashboard</p>
-        </footer>
     </div>
 
     <script>
-        // Color schemes for random selection
-        const colorSchemes = [
-            {
-                primary: '#2c3e50',
-                secondary: '#3498db',
-                accent: '#e74c3c',
-                success: '#2ecc71',
-                warning: '#f39c12',
-                info: '#17a2b8'
-            },
-            {
-                primary: '#1a535c',
-                secondary: '#4ecdc4',
-                accent: '#ff6b6b',
-                success: '#06d6a0',
-                warning: '#ffd166',
-                info: '#118ab2'
-            },
-            {
-                primary: '#3d348b',
-                secondary: '#7678ed',
-                accent: '#f18701',
-                success: '#00a878',
-                warning: '#f7b801',
-                info: '#5c80bc'
-            },
-            {
-                primary: '#5d2a42',
-                secondary: '#fb6376',
-                accent: '#fcb1a6',
-                success: '#5cb85c',
-                warning: '#ffc857',
-                info: '#5d737e'
-            },
-            {
-                primary: '#0b3954',
-                secondary: '#087e8b',
-                accent: '#ff5a5f',
-                success: '#3cbbb1',
-                warning: '#f0b67f',
-                info: '#6e8898'
-            },
-            {
-                primary: '#2f1847',
-                secondary: '#624763',
-                accent: '#c62e65',
-                success: '#7bd389',
-                warning: '#f9c846',
-                info: '#9b9b9b'
-            },
-            {
-                primary: '#1e2a47',
-                secondary: '#3a506b',
-                accent: '#ff6b6b',
-                success: '#4ecdc4',
-                warning: '#ffe66d',
-                info: '#6fffe9'
-            },
-            {
-                primary: '#3c1642',
-                secondary: '#086375',
-                accent: '#1dd3b0',
-                success: '#affc41',
-                warning: '#b2ff9e',
-                info: '#a2faa3'
-            }
-        ];
+        // Initialize vehicles array from localStorage
+        let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+        let twilioConfig = JSON.parse(localStorage.getItem('twilioConfig')) || {};
 
-        // Set current date
-        function setCurrentDate() {
+        // Set current datetime for intime by default
+        document.getElementById('intime').value = getCurrentDateTime();
+
+        // Load saved Twilio configuration
+        if (twilioConfig.accountSID) {
+            document.getElementById('accountSID').value = twilioConfig.accountSID;
+            document.getElementById('authToken').value = twilioConfig.authToken;
+            document.getElementById('twilioNumber').value = twilioConfig.twilioNumber;
+            document.getElementById('toNumber').value = twilioConfig.toNumber;
+        }
+
+        function getCurrentDateTime() {
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('dateText').textContent = now.toLocaleDateString('en-US', options);
-        }
-        
-        // Create flowing lines in the title header
-        function createTitleFlow() {
-            const container = document.getElementById('titleFlowContainer');
-            const lineCount = 5;
-            
-            for (let i = 0; i < lineCount; i++) {
-                const line = document.createElement('div');
-                line.className = 'title-flow-line';
-                line.style.top = `${Math.random() * 100}%`;
-                line.style.animationDelay = `${Math.random() * 2}s`;
-                container.appendChild(line);
-            }
-        }
-        
-        // Function to change color scheme
-        function changeColorScheme() {
-            // Select a random color scheme
-            const randomScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
-            
-            // Apply the color transition class to elements
-            document.body.classList.add('color-transition');
-            
-            // Update CSS variables
-            document.documentElement.style.setProperty('--primary', randomScheme.primary);
-            document.documentElement.style.setProperty('--secondary', randomScheme.secondary);
-            document.documentElement.style.setProperty('--accent', randomScheme.accent);
-            document.documentElement.style.setProperty('--success', randomScheme.success);
-            document.documentElement.style.setProperty('--warning', randomScheme.warning);
-            document.documentElement.style.setProperty('--info', randomScheme.info);
-            
-            // Remove transition class after animation completes
-            setTimeout(() => {
-                document.body.classList.remove('color-transition');
-            }, 500);
-            
-            // Create a visual feedback effect
-            createColorChangeEffect();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            return now.toISOString().slice(0, 16);
         }
 
-        // Function to create visual feedback when colors change
-        function createColorChangeEffect() {
-            const feedback = document.createElement('div');
-            feedback.style.position = 'fixed';
-            feedback.style.top = '0';
-            feedback.style.left = '0';
-            feedback.style.width = '100%';
-            feedback.style.height = '100%';
-            feedback.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-            feedback.style.zIndex = '9999';
-            feedback.style.pointerEvents = 'none';
-            feedback.style.opacity = '0';
-            feedback.style.transition = 'opacity 0.3s ease';
-            
-            document.body.appendChild(feedback);
-            
-            // Fade in and out
-            setTimeout(() => {
-                feedback.style.opacity = '1';
-            }, 10);
-            
-            setTimeout(() => {
-                feedback.style.opacity = '0';
-            }, 300);
-            
-            // Remove element after animation
-            setTimeout(() => {
-                document.body.removeChild(feedback);
-            }, 600);
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '-';
+            const date = new Date(dateTimeStr);
+            return date.toLocaleString();
         }
 
-        // Add click event listener to the entire document
-        document.addEventListener('click', function(event) {
-            // Don't trigger color change when clicking on modal close buttons or interactive elements
-            if (!event.target.classList.contains('close-btn') && 
-                !event.target.classList.contains('close-zoom') &&
-                !event.target.closest('.modal-content') &&
-                !event.target.closest('.point-button') &&
-                !event.target.closest('.month-tab') &&
-                !event.target.closest('.plant-button') &&
-                !event.target.closest('.dispatch-button') &&
-                !event.target.closest('.revenue-button')) {
-                changeColorScheme();
-            }
-        });
-
-        // Add the color-transition class to elements that should animate
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add transition class to key elements
-            const elementsToTransition = [
-                '.box', 
-                'header', 
-                '.current-date', 
-                '.point-button', 
-                '.month-tab', 
-                '.plant-button', 
-                '.dispatch-button', 
-                '.revenue-button',
-                '.machine-table th',
-                '.manpower-table th',
-                '.stat-card'
-            ];
-            
-            elementsToTransition.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(element => {
-                    element.classList.add('color-transition');
-                });
-            });
-        });
-        
-        // Call the function when page loads
-        window.onload = function() {
-            setCurrentDate();
-            createTitleFlow();
-        };
-        
-        // Track active box for green flow effect
-        let activeBox = null;
-        
-        function openModal(modalId, boxElement) {
-            // Remove active class from previous box
-            if (activeBox) {
-                activeBox.classList.remove('active');
-            }
-            
-            // Add active class to clicked box
-            boxElement.classList.add('active');
-            activeBox = boxElement;
-            
-            // Create green flow effect
-            createGreenFlow(boxElement);
-            
-            // Show modal
-            document.getElementById(modalId).style.display = 'block';
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            
-            // Remove active class from box when modal is closed
-            if (activeBox) {
-                activeBox.classList.remove('active');
-                activeBox = null;
-            }
-        }
-        
-        // Create green flow effect
-        function createGreenFlow(boxElement) {
-            const flowContainer = document.getElementById('greenFlow');
-            flowContainer.innerHTML = '';
-            
-            const rect = boxElement.getBoundingClientRect();
-            const flowLine = document.createElement('div');
-            flowLine.className = 'flow-line';
-            
-            // Position the flow line to start from the box
-            flowLine.style.top = `${rect.top + rect.height/2}px`;
-            flowLine.style.left = `${rect.left}px`;
-            
-            flowContainer.appendChild(flowLine);
-            
-            // Remove the flow line after animation completes
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = message;
+            messageDiv.className = `message ${type}`;
             setTimeout(() => {
-                flowLine.remove();
-            }, 1500);
+                messageDiv.innerHTML = '';
+                messageDiv.className = '';
+            }, 5000);
         }
-        
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const modals = document.getElementsByClassName('modal');
-            for (let i = 0; i < modals.length; i++) {
-                if (event.target == modals[i]) {
-                    modals[i].style.display = 'none';
-                    
-                    // Remove active class from box when modal is closed
-                    if (activeBox) {
-                        activeBox.classList.remove('active');
-                        activeBox = null;
+
+        function saveTwilioConfig() {
+            twilioConfig = {
+                accountSID: document.getElementById('accountSID').value.trim(),
+                authToken: document.getElementById('authToken').value.trim(),
+                twilioNumber: document.getElementById('twilioNumber').value.trim(),
+                toNumber: document.getElementById('toNumber').value.trim()
+            };
+            localStorage.setItem('twilioConfig', JSON.stringify(twilioConfig));
+        }
+
+        async function testTwilioConnection() {
+            saveTwilioConfig();
+            
+            if (!twilioConfig.accountSID || !twilioConfig.authToken) {
+                showMessage('Please enter Twilio Account SID and Auth Token!', 'error');
+                return;
+            }
+
+            const statusDiv = document.getElementById('twilioStatus');
+            statusDiv.innerHTML = 'Testing Twilio connection...';
+            statusDiv.className = 'twilio-status info';
+
+            try {
+                // Test by making a simple request to Twilio API
+                const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioConfig.accountSID}.json`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(twilioConfig.accountSID + ':' + twilioConfig.authToken)
                     }
+                });
+
+                if (response.ok) {
+                    statusDiv.innerHTML = '✅ Twilio connection successful!';
+                    statusDiv.className = 'twilio-status twilio-connected';
+                    showMessage('Twilio connection test successful!', 'success');
+                } else {
+                    throw new Error('Authentication failed');
                 }
+            } catch (error) {
+                statusDiv.innerHTML = '❌ Twilio connection failed. Check your credentials.';
+                statusDiv.className = 'twilio-status twilio-disconnected';
+                showMessage('Twilio connection failed: ' + error.message, 'error');
             }
         }
-        
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const modals = document.getElementsByClassName('modal');
-                for (let i = 0; i < modals.length; i++) {
-                    modals[i].style.display = 'none';
+
+        async function sendWhatsAppViaTwilio(vehicle) {
+            saveTwilioConfig();
+
+            if (!twilioConfig.accountSID || !twilioConfig.authToken) {
+                throw new Error('Twilio not configured. Please set up Twilio credentials.');
+            }
+
+            const customMessage = document.getElementById('customMessage').value.trim();
+            let messageBody = customMessage || `🚚 *Vehicle Departure Notification*
+
+*Vehicle Number:* ${vehicle.vehicleNumber}
+*Tonnage:* ${vehicle.tonnage} tons
+*Intime:* ${formatDateTime(vehicle.intime)}
+*Outtime:* ${formatDateTime(vehicle.outtime)}
+
+Vehicle has successfully departed from the facility.
+
+Thank you for your business! 📦`;
+
+            const twilioData = new URLSearchParams();
+            twilioData.append('To', twilioConfig.toNumber);
+            twilioData.append('From', twilioConfig.twilioNumber);
+            twilioData.append('Body', messageBody);
+
+            try {
+                const response = await fetch(
+                    `https://api.twilio.com/2010-04-01/Accounts/${twilioConfig.accountSID}/Messages.json`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Basic ' + btoa(twilioConfig.accountSID + ':' + twilioConfig.authToken),
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: twilioData
+                    }
+                );
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    return {
+                        success: true,
+                        messageId: result.sid,
+                        status: result.status
+                    };
+                } else {
+                    throw new Error(result.message || 'Failed to send message');
                 }
+            } catch (error) {
+                throw new Error('Twilio API error: ' + error.message);
+            }
+        }
+
+        function saveVehicle() {
+            const vehicleNumber = document.getElementById('vehicleNumber').value.trim();
+            const tonnage = document.getElementById('tonnage').value.trim();
+            const intime = document.getElementById('intime').value;
+
+            if (!vehicleNumber || !tonnage || !intime) {
+                showMessage('Please fill all required fields!', 'error');
+                return;
+            }
+
+            const existingVehicle = vehicles.find(v => 
+                v.vehicleNumber === vehicleNumber && v.status === 'IN'
+            );
+
+            if (existingVehicle) {
+                showMessage('Vehicle is already checked in!', 'error');
+                return;
+            }
+
+            const vehicle = {
+                id: Date.now(),
+                vehicleNumber: vehicleNumber,
+                tonnage: tonnage,
+                intime: intime,
+                outtime: '',
+                status: 'IN',
+                whatsappSent: false
+            };
+
+            vehicles.push(vehicle);
+            saveToLocalStorage();
+            updateDisplay();
+            clearForm();
+            showMessage('Vehicle entry saved successfully!');
+        }
+
+        async function setOuttimeAndSendWhatsApp() {
+            const vehicleNumber = document.getElementById('vehicleNumber').value.trim();
+            let outtime = document.getElementById('outtime').value;
+
+            if (!vehicleNumber) {
+                showMessage('Please enter vehicle number!', 'error');
+                return;
+            }
+
+            if (!outtime) {
+                outtime = getCurrentDateTime();
+            }
+
+            const vehicleIndex = vehicles.findIndex(v => 
+                v.vehicleNumber === vehicleNumber && v.status === 'IN'
+            );
+
+            if (vehicleIndex === -1) {
+                showMessage('Vehicle not found or already checked out!', 'error');
+                return;
+            }
+
+            vehicles[vehicleIndex].outtime = outtime;
+            vehicles[vehicleIndex].status = 'OUT';
+
+            // Send WhatsApp via Twilio
+            showMessage('Sending WhatsApp message via Twilio...', 'info');
+            
+            try {
+                const result = await sendWhatsAppViaTwilio(vehicles[vehicleIndex]);
                 
-                // Remove active class from box when modal is closed
-                if (activeBox) {
-                    activeBox.classList.remove('active');
-                    activeBox = null;
-                }
+                vehicles[vehicleIndex].whatsappSent = true;
+                vehicles[vehicleIndex].whatsappMessageId = result.messageId;
+                vehicles[vehicleIndex].whatsappStatus = result.status;
+
+                saveToLocalStorage();
+                updateDisplay();
+                showMessage('Outtime set and WhatsApp message sent successfully! Message SID: ' + result.messageId);
+                
+            } catch (error) {
+                vehicles[vehicleIndex].whatsappSent = false;
+                vehicles[vehicleIndex].whatsappError = error.message;
+                showMessage('Outtime set but WhatsApp failed: ' + error.message, 'error');
             }
-        });
-        
-        // Image zoom functionality
-        function zoomImage(src) {
-            document.getElementById('zoomedImg').src = src;
-            document.getElementById('imageZoomModal').style.display = 'flex';
+
+            saveToLocalStorage();
+            updateDisplay();
         }
-        
-        function closeZoomModal() {
-            document.getElementById('imageZoomModal').style.display = 'none';
+
+        function updateDisplay() {
+            const tbody = document.getElementById('vehicleTableBody');
+            tbody.innerHTML = '';
+
+            vehicles.forEach(vehicle => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${vehicle.vehicleNumber}</td>
+                    <td>${vehicle.tonnage} tons</td>
+                    <td>${formatDateTime(vehicle.intime)}</td>
+                    <td>${vehicle.outtime ? formatDateTime(vehicle.outtime) : '-'}</td>
+                    <td><span class="status-${vehicle.status.toLowerCase()}">${vehicle.status}</span></td>
+                    <td>
+                        ${vehicle.status === 'IN' ? 
+                            `<button onclick="quickCheckout('${vehicle.vehicleNumber}')" class="btn" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer;">Check Out</button>` : 
+                            vehicle.whatsappSent ? 
+                                '✅ WhatsApp Sent' : 
+                                '❌ WhatsApp Failed'
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
-        
-        // Close image zoom modal when clicking outside the image
-        document.getElementById('imageZoomModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeZoomModal();
+
+        function quickCheckout(vehicleNumber) {
+            document.getElementById('vehicleNumber').value = vehicleNumber;
+            document.getElementById('outtime').value = getCurrentDateTime();
+            setOuttimeAndSendWhatsApp();
+        }
+
+        function clearForm() {
+            document.getElementById('vehicleNumber').value = '';
+            document.getElementById('tonnage').value = '';
+            document.getElementById('intime').value = getCurrentDateTime();
+            document.getElementById('outtime').value = '';
+            document.getElementById('customMessage').value = '';
+        }
+
+        function exportData() {
+            if (vehicles.length === 0) {
+                showMessage('No data to export!', 'error');
+                return;
             }
-        });
-        
-        // New functions for the enhanced mine operations modal
-        function toggleBreakdown(event, breakdownId) {
-            const breakdown = document.getElementById(breakdownId);
-            const button = event.target;
-            
-            // Toggle active class on button
-            button.classList.toggle('active');
-            
-            // Toggle display of breakdown
-            if (breakdown.classList.contains('active')) {
-                breakdown.classList.remove('active');
-            } else {
-                breakdown.classList.add('active');
+
+            let csv = 'Vehicle Number,Tonnage,Intime,Outtime,Status,WhatsApp Sent,Message ID\n';
+            vehicles.forEach(vehicle => {
+                csv += `"${vehicle.vehicleNumber}","${vehicle.tonnage}","${formatDateTime(vehicle.intime)}","${formatDateTime(vehicle.outtime)}","${vehicle.status}","${vehicle.whatsappSent || false}","${vehicle.whatsappMessageId || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'vehicle_tracking_data.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            showMessage('Data exported successfully!');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                vehicles = [];
+                saveToLocalStorage();
+                updateDisplay();
+                showMessage('All data cleared successfully!');
             }
         }
-        
-        function switchMonth(monthId, tabElement) {
-            // Get all tabs and contents in the same breakdown
-            const breakdown = tabElement.closest('.monthly-breakdown');
-            const tabs = breakdown.querySelectorAll('.month-tab');
-            const contents = breakdown.querySelectorAll('.month-content');
-            
-            // Remove active class from all tabs and contents
-            tabs.forEach(tab => tab.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding content
-            tabElement.classList.add('active');
-            document.getElementById(monthId).classList.add('active');
+
+        function saveToLocalStorage() {
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
         }
-        
-        // Boulder Transport month content switching
-        function switchBoulderMonth(contentId, tabElement) {
-            // Get all tabs and contents in the boulder modal
-            const tabs = document.querySelectorAll('#weighbridgeModal .month-tab');
-            const contents = document.querySelectorAll('#weighbridgeModal .month-content');
-            
-            // Remove active class from all tabs and contents
-            tabs.forEach(tab => tab.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding content
-            tabElement.classList.add('active');
-            document.getElementById(contentId).classList.add('active');
-        }
-        
-        // Payables month content switching
-        function switchPayablesMonth(contentId, tabElement) {
-            // Get all tabs and contents in the payables modal
-            const tabs = document.querySelectorAll('#payablesModal .month-tab');
-            const contents = document.querySelectorAll('#payablesModal .month-content');
-            
-            // Remove active class from all tabs and contents
-            tabs.forEach(tab => tab.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding content
-            tabElement.classList.add('active');
-            document.getElementById(contentId).classList.add('active');
-        }
-        
-        // Plant operations content switching
-        function switchPlantContent(contentId, buttonElement) {
-            // Get all buttons and contents in the plant modal
-            const buttons = document.querySelectorAll('#plantModal .plant-button');
-            const contents = document.querySelectorAll('#plantModal .month-content');
-            
-            // Remove active class from all buttons and contents
-            buttons.forEach(button => button.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding content
-            buttonElement.classList.add('active');
-            document.getElementById(contentId).classList.add('active');
-        }
-        
-        // Dispatch month content switching
-        function switchDispatchMonth(contentId, buttonElement) {
-            // Get all buttons and contents in the dispatch modal
-            const buttons = document.querySelectorAll('#dispatchModal .dispatch-button');
-            const contents = document.querySelectorAll('#dispatchModal .month-content');
-            
-            // Remove active class from all buttons and contents
-            buttons.forEach(button => button.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding content
-            buttonElement.classList.add('active');
-            document.getElementById(contentId).classList.add('active');
-        }
-        
-        // Revenue month content switching
-        function switchRevenueMonth(contentId, buttonElement) {
-            // Get all buttons and contents in the revenue modal
-            const buttons = document.querySelectorAll('#revenueModal .revenue-button');
-            const contents = document.querySelectorAll('#revenueModal .month-content');
-            
-            // Remove active class from all buttons and contents
-            buttons.forEach(button => button.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding content
-            buttonElement.classList.add('active');
-            document.getElementById(contentId).classList.add('active');
-        }
+
+        // Initialize display on page load
+        updateDisplay();
     </script>
 </body>
 </html>
