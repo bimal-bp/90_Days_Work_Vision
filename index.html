@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Tracking System with Twilio WhatsApp</title>
+    <title>Vehicle Tracking - WhatsApp Web Automation</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +28,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -40,23 +40,43 @@
         }
 
         .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
             padding: 30px;
         }
 
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+        .setup-steps {
+            background: #e8f4f8;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #25D366;
         }
 
-        .form-section, .data-section {
+        .step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .form-section {
             background: #f8f9fa;
             padding: 25px;
             border-radius: 10px;
-            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -70,18 +90,17 @@
             color: #2c3e50;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
         }
 
         input:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: #25D366;
         }
 
         .btn {
@@ -95,13 +114,13 @@
             margin: 5px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        .btn-success {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
             color: white;
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: white;
         }
 
@@ -122,6 +141,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             max-height: 400px;
             overflow-y: auto;
+            margin-top: 20px;
         }
 
         table {
@@ -142,8 +162,27 @@
             top: 0;
         }
 
-        .status-in { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; }
-        .status-out { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-sent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
         .message {
             padding: 15px;
@@ -157,87 +196,153 @@
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
 
-        .config-section {
-            background: #e8f4f8;
+        .automation-controls {
+            background: #fff3cd;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            border: 2px solid #ffeaa7;
         }
 
-        .twilio-status {
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #25D366;
+        }
+
+        .whatsapp-status {
             padding: 10px;
             border-radius: 5px;
-            margin-top: 10px;
-            font-size: 14px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
         }
 
-        .twilio-connected {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .connecting { background: #fff3cd; color: #856404; }
+        
+        .api-info {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
         }
-
-        .twilio-disconnected {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        
+        .api-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
-
-        .whatsapp-indicator {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 5px;
+        
+        .api-info ul {
+            padding-left: 20px;
+            margin: 10px 0;
         }
-
-        .whatsapp-success {
-            background: #25D366;
-            color: white;
+        
+        .api-info li {
+            margin-bottom: 8px;
         }
-
-        .whatsapp-failed {
-            background: #dc3545;
-            color: white;
+        
+        .api-info code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚚 Vehicle Tracking with Twilio WhatsApp</h1>
-            <p>Automated WhatsApp notifications using Twilio API</p>
+            <h1>🤖 WhatsApp Web Automation</h1>
+            <p>Vehicle Tracking with Automated WhatsApp Messages</p>
         </div>
 
         <div class="content">
-            <div class="form-section">
-                <!-- Twilio Configuration -->
-                <div class="config-section">
-                    <h3>🔧 Twilio Configuration</h3>
-                    <div class="form-group">
-                        <label for="accountSID">Account SID</label>
-                        <input type="text" id="accountSID" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-                    </div>
-                    <div class="form-group">
-                        <label for="authToken">Auth Token</label>
-                        <input type="password" id="authToken" placeholder="Your Twilio Auth Token">
-                    </div>
-                    <div class="form-group">
-                        <label for="twilioNumber">Twilio WhatsApp Number</label>
-                        <input type="text" id="twilioNumber" placeholder="whatsapp:+14155238886" value="whatsapp:+14155238886">
-                    </div>
-                    <div class="form-group">
-                        <label for="toNumber">Recipient WhatsApp Number</label>
-                        <input type="text" id="toNumber" placeholder="whatsapp:+919876543210">
-                    </div>
-                    <button class="btn btn-primary" onclick="testTwilioConnection()">Test Twilio Connection</button>
-                    <div id="twilioStatus" class="twilio-status"></div>
+            <!-- Setup Instructions -->
+            <div class="setup-steps">
+                <h3>🚀 Setup Instructions</h3>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>WhatsApp Business API</strong>
+                    <p>This demo simulates WhatsApp integration. For actual implementation, you need WhatsApp Business API access.</p>
                 </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Configure Recipients</strong>
+                    <p>Add phone numbers that will receive vehicle departure notifications</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Start Automation</strong>
+                    <p>Click "Start WhatsApp Automation" to simulate the connection process</p>
+                </div>
+            </div>
 
-                <h3>📝 Vehicle Entry Form</h3>
+            <!-- API Information -->
+            <div class="api-info">
+                <h4>🔧 Why You're Not Receiving Actual WhatsApp Messages</h4>
+                <p>This is a <strong>frontend simulation</strong> only. To send real WhatsApp messages, you need:</p>
+                <ul>
+                    <li><strong>WhatsApp Business API</strong> access from Meta</li>
+                    <li>A registered business account</li>
+                    <li>Approved message templates for automated messages</li>
+                    <li>Backend server with proper API integration</li>
+                </ul>
+                <p><strong>Alternative Solutions:</strong></p>
+                <ul>
+                    <li>Use WhatsApp Cloud API (requires Facebook Business Manager)</li>
+                    <li>Third-party services like Twilio, MessageBird, or Vonage</li>
+                    <li>Python automation with Selenium (against WhatsApp's ToS)</li>
+                </ul>
+            </div>
+
+            <!-- WhatsApp Configuration -->
+            <div class="form-section">
+                <h3>📱 WhatsApp Configuration</h3>
                 <div id="message"></div>
 
+                <div class="form-group">
+                    <label for="recipientNumbers">Recipient Phone Numbers (comma separated)</label>
+                    <input type="text" id="recipientNumbers" placeholder="91934824XXXX,919876543210" value="91934824XXXX">
+                    <small style="color: #666;">Format: 91XXXXXXXXXX (without +)</small>
+                </div>
+
+                <div class="automation-controls">
+                    <h4>⚙️ Automation Controls</h4>
+                    <div class="control-buttons">
+                        <button class="btn btn-success" onclick="startWhatsAppAutomation()">Start WhatsApp Automation</button>
+                        <button class="btn btn-warning" onclick="stopWhatsAppAutomation()">Stop Automation</button>
+                        <button class="btn btn-primary" onclick="testWhatsAppConnection()">Test Connection</button>
+                    </div>
+                    <div id="whatsappStatus" class="whatsapp-status disconnected">
+                        🔴 WhatsApp Automation: Not Connected
+                    </div>
+                </div>
+
+                <!-- QR Code Placeholder -->
+                <div id="qrCodeContainer" class="qr-code" style="display: none;">
+                    <h4>📲 Scan QR Code</h4>
+                    <div id="qrCode"></div>
+                    <p>Scan this QR code with your WhatsApp to connect</p>
+                </div>
+            </div>
+
+            <!-- Vehicle Entry Form -->
+            <div class="form-section">
+                <h3>🚚 Vehicle Entry Form</h3>
+                
                 <div class="form-group">
                     <label for="vehicleNumber">Vehicle Number *</label>
                     <input type="text" id="vehicleNumber" placeholder="e.g., KA01AB1234" required>
@@ -258,35 +363,37 @@
                     <input type="datetime-local" id="outtime" required>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-success" onclick="saveVehicleAndSendWhatsApp()">Save Vehicle & Send WhatsApp</button>
-                    <button class="btn btn-warning" onclick="clearForm()">Clear Form</button>
+                <div class="form-group">
+                    <label for="driverPhone">Driver Phone (Optional - for personal notification)</label>
+                    <input type="text" id="driverPhone" placeholder="919876543210">
                 </div>
+
+                <button class="btn btn-success" onclick="saveVehicleAndSendWhatsApp()">Save Vehicle & Send WhatsApp</button>
+                <button class="btn btn-warning" onclick="clearForm()">Clear Form</button>
             </div>
 
-            <div class="data-section">
-                <h3>📊 Vehicle Records</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Vehicle No</th>
-                                <th>Tonnage</th>
-                                <th>Intime</th>
-                                <th>Outtime</th>
-                                <th>Status</th>
-                                <th>WhatsApp</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vehicleTableBody">
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Vehicle Records -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Vehicle No</th>
+                            <th>Tonnage</th>
+                            <th>Intime</th>
+                            <th>Outtime</th>
+                            <th>WhatsApp Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleTableBody">
+                    </tbody>
+                </table>
+            </div>
 
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-warning" onclick="exportData()">Export Data</button>
-                    <button class="btn" onclick="clearAllData()" style="background: #e74c3c; color: white;">Clear All Data</button>
-                </div>
+            <!-- Quick Actions -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="exportData()">Export Data</button>
+                <button class="btn" onclick="clearAllData()" style="background: #e74c3c; color: white;">Clear All Data</button>
             </div>
         </div>
     </div>
@@ -294,19 +401,12 @@
     <script>
         // Initialize vehicles array from localStorage
         let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-        let twilioConfig = JSON.parse(localStorage.getItem('twilioConfig')) || {};
+        let whatsappAutomation = null;
+        let isWhatsAppConnected = false;
 
         // Set current datetime for intime and outtime by default
         document.getElementById('intime').value = getCurrentDateTime();
         document.getElementById('outtime').value = getCurrentDateTime();
-
-        // Load saved Twilio configuration
-        if (twilioConfig.accountSID) {
-            document.getElementById('accountSID').value = twilioConfig.accountSID;
-            document.getElementById('authToken').value = twilioConfig.authToken;
-            document.getElementById('twilioNumber').value = twilioConfig.twilioNumber;
-            document.getElementById('toNumber').value = twilioConfig.toNumber;
-        }
 
         function getCurrentDateTime() {
             const now = new Date();
@@ -330,57 +430,81 @@
             }, 5000);
         }
 
-        function saveTwilioConfig() {
-            twilioConfig = {
-                accountSID: document.getElementById('accountSID').value.trim(),
-                authToken: document.getElementById('authToken').value.trim(),
-                twilioNumber: document.getElementById('twilioNumber').value.trim(),
-                toNumber: document.getElementById('toNumber').value.trim()
-            };
-            localStorage.setItem('twilioConfig', JSON.stringify(twilioConfig));
+        function updateWhatsAppStatus(status, message) {
+            const statusDiv = document.getElementById('whatsappStatus');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `whatsapp-status ${status}`;
+            isWhatsAppConnected = status === 'connected';
         }
 
-        async function testTwilioConnection() {
-            saveTwilioConfig();
+        // Simulate WhatsApp Web Automation
+        function startWhatsAppAutomation() {
+            updateWhatsAppStatus('connecting', '🟡 Connecting to WhatsApp Web...');
             
-            if (!twilioConfig.accountSID || !twilioConfig.authToken) {
-                showMessage('Please enter Twilio Account SID and Auth Token!', 'error');
+            // Simulate connection process
+            setTimeout(() => {
+                // Show QR code (simulated)
+                const qrContainer = document.getElementById('qrCodeContainer');
+                qrContainer.style.display = 'block';
+                document.getElementById('qrCode').innerHTML = 
+                    '<div style="background: #25D366; color: white; padding: 50px; border-radius: 10px; font-size: 20px;">' +
+                    '📱 WhatsApp QR Code<br><small>Simulated - In real implementation, this would be a real QR code</small>' +
+                    '</div>';
+                
+                // Simulate successful connection after QR scan
+                setTimeout(() => {
+                    qrContainer.style.display = 'none';
+                    updateWhatsAppStatus('connected', '✅ WhatsApp Automation: Connected & Ready');
+                    showMessage('WhatsApp automation started successfully!', 'success');
+                }, 3000);
+                
+            }, 2000);
+        }
+
+        function stopWhatsAppAutomation() {
+            updateWhatsAppStatus('disconnected', '🔴 WhatsApp Automation: Stopped');
+            showMessage('WhatsApp automation stopped.', 'info');
+        }
+
+        function testWhatsAppConnection() {
+            if (!isWhatsAppConnected) {
+                showMessage('WhatsApp is not connected. Please start automation first.', 'error');
+                return;
+            }
+            
+            const recipients = document.getElementById('recipientNumbers').value.split(',').map(num => num.trim());
+            if (recipients.length === 0) {
+                showMessage('Please add recipient phone numbers.', 'error');
                 return;
             }
 
-            const statusDiv = document.getElementById('twilioStatus');
-            statusDiv.innerHTML = 'Testing Twilio connection...';
-            statusDiv.className = 'twilio-status info';
-
-            try {
-                const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioConfig.accountSID}.json`, {
-                    headers: {
-                        'Authorization': 'Basic ' + btoa(twilioConfig.accountSID + ':' + twilioConfig.authToken)
-                    }
-                });
-
-                if (response.ok) {
-                    statusDiv.innerHTML = '✅ Twilio connection successful!';
-                    statusDiv.className = 'twilio-status twilio-connected';
-                    showMessage('Twilio connection test successful!', 'success');
-                } else {
-                    throw new Error('Authentication failed');
-                }
-            } catch (error) {
-                statusDiv.innerHTML = '❌ Twilio connection failed. Check your credentials.';
-                statusDiv.className = 'twilio-status twilio-disconnected';
-                showMessage('Twilio connection failed: ' + error.message, 'error');
-            }
+            showMessage('Sending test message...', 'info');
+            
+            // Simulate test message
+            setTimeout(() => {
+                showMessage('✅ Test message sent successfully! (Simulation only - no actual message sent)', 'success');
+            }, 2000);
         }
 
-        async function sendWhatsAppViaTwilio(vehicle) {
-            saveTwilioConfig();
+        // Simulate sending WhatsApp message
+        function sendWhatsAppMessage(vehicle, additionalRecipient = null) {
+            return new Promise((resolve, reject) => {
+                if (!isWhatsAppConnected) {
+                    reject('WhatsApp automation not connected. Please start automation first.');
+                    return;
+                }
 
-            if (!twilioConfig.accountSID || !twilioConfig.authToken) {
-                throw new Error('Twilio not configured. Please set up Twilio credentials.');
-            }
+                const recipients = document.getElementById('recipientNumbers').value.split(',').map(num => num.trim());
+                if (additionalRecipient) {
+                    recipients.push(additionalRecipient);
+                }
 
-            const messageBody = `🚚 *Vehicle Departure Notification*
+                if (recipients.length === 0) {
+                    reject('No recipients configured.');
+                    return;
+                }
+
+                const message = `🚚 *Vehicle Departure Notification*
 
 *Vehicle Number:* ${vehicle.vehicleNumber}
 *Tonnage:* ${vehicle.tonnage} tons
@@ -391,38 +515,23 @@ Vehicle has successfully departed from the facility.
 
 Thank you for your business! 📦`;
 
-            const twilioData = new URLSearchParams();
-            twilioData.append('To', twilioConfig.toNumber);
-            twilioData.append('From', twilioConfig.twilioNumber);
-            twilioData.append('Body', messageBody);
+                // Simulate sending to all recipients
+                showMessage(`Sending WhatsApp to ${recipients.length} recipients...`, 'info');
 
-            try {
-                const response = await fetch(
-                    `https://api.twilio.com/2010-04-01/Accounts/${twilioConfig.accountSID}/Messages.json`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Basic ' + btoa(twilioConfig.accountSID + ':' + twilioConfig.authToken),
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: twilioData
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Simulate 90% success rate
+                    if (Math.random() > 0.1) {
+                        resolve({
+                            success: true,
+                            recipients: recipients,
+                            message: 'WhatsApp messages sent successfully (SIMULATION ONLY)'
+                        });
+                    } else {
+                        reject('Failed to send WhatsApp message. Please check connection.');
                     }
-                );
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    return {
-                        success: true,
-                        messageId: result.sid,
-                        status: result.status
-                    };
-                } else {
-                    throw new Error(result.message || 'Failed to send message');
-                }
-            } catch (error) {
-                throw new Error('Twilio API error: ' + error.message);
-            }
+                }, 3000);
+            });
         }
 
         async function saveVehicleAndSendWhatsApp() {
@@ -430,6 +539,7 @@ Thank you for your business! 📦`;
             const tonnage = document.getElementById('tonnage').value.trim();
             const intime = document.getElementById('intime').value;
             const outtime = document.getElementById('outtime').value;
+            const driverPhone = document.getElementById('driverPhone').value.trim();
 
             if (!vehicleNumber || !tonnage || !intime || !outtime) {
                 showMessage('Please fill all required fields!', 'error');
@@ -437,10 +547,7 @@ Thank you for your business! 📦`;
             }
 
             // Check if vehicle already exists
-            const existingVehicle = vehicles.find(v => 
-                v.vehicleNumber === vehicleNumber
-            );
-
+            const existingVehicle = vehicles.find(v => v.vehicleNumber === vehicleNumber);
             if (existingVehicle) {
                 showMessage('Vehicle already exists in records!', 'error');
                 return;
@@ -454,35 +561,35 @@ Thank you for your business! 📦`;
                 intime: intime,
                 outtime: outtime,
                 status: 'OUT',
-                whatsappSent: false
+                whatsappSent: false,
+                timestamp: new Date().toISOString()
             };
 
-            // Send WhatsApp via Twilio
-            showMessage('Saving vehicle and sending WhatsApp message...', 'info');
-            
+            // Send WhatsApp message
             try {
-                const result = await sendWhatsAppViaTwilio(vehicle);
+                const result = await sendWhatsAppMessage(vehicle, driverPhone || null);
                 
                 vehicle.whatsappSent = true;
-                vehicle.whatsappMessageId = result.messageId;
-                vehicle.whatsappStatus = result.status;
+                vehicle.whatsappStatus = 'sent';
+                vehicle.recipients = result.recipients;
 
                 vehicles.push(vehicle);
                 saveToLocalStorage();
                 updateDisplay();
                 clearForm();
                 
-                showMessage('✅ Vehicle saved and WhatsApp message sent successfully! Message SID: ' + result.messageId);
+                showMessage(`✅ Vehicle saved and WhatsApp simulation completed! (No actual message sent)`, 'success');
                 
             } catch (error) {
                 vehicle.whatsappSent = false;
-                vehicle.whatsappError = error.message;
-                
+                vehicle.whatsappStatus = 'failed';
+                vehicle.whatsappError = error;
+
                 vehicles.push(vehicle);
                 saveToLocalStorage();
                 updateDisplay();
                 
-                showMessage('❌ Vehicle saved but WhatsApp failed: ' + error.message, 'error');
+                showMessage('❌ Vehicle saved but WhatsApp simulation failed: ' + error, 'error');
             }
         }
 
@@ -491,9 +598,8 @@ Thank you for your business! 📦`;
             tbody.innerHTML = '';
 
             vehicles.forEach(vehicle => {
-                const whatsappStatus = vehicle.whatsappSent ? 
-                    '<span class="whatsapp-indicator whatsapp-success">✅ Sent</span>' : 
-                    '<span class="whatsapp-indicator whatsapp-failed">❌ Failed</span>';
+                const statusClass = vehicle.whatsappSent ? 'status-sent' : 'status-failed';
+                const statusText = vehicle.whatsappSent ? '✅ Sent (Simulated)' : '❌ Failed';
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -501,11 +607,32 @@ Thank you for your business! 📦`;
                     <td>${vehicle.tonnage} tons</td>
                     <td>${formatDateTime(vehicle.intime)}</td>
                     <td>${formatDateTime(vehicle.outtime)}</td>
-                    <td><span class="status-${vehicle.status.toLowerCase()}">${vehicle.status}</span></td>
-                    <td>${whatsappStatus}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;" 
+                                onclick="resendWhatsApp('${vehicle.id}')">
+                            Resend
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        async function resendWhatsApp(vehicleId) {
+            const vehicle = vehicles.find(v => v.id == vehicleId);
+            if (!vehicle) return;
+
+            try {
+                const result = await sendWhatsAppMessage(vehicle);
+                vehicle.whatsappSent = true;
+                vehicle.whatsappStatus = 'sent';
+                saveToLocalStorage();
+                updateDisplay();
+                showMessage('✅ WhatsApp simulation resent successfully!', 'success');
+            } catch (error) {
+                showMessage('❌ Failed to resend WhatsApp simulation: ' + error, 'error');
+            }
         }
 
         function clearForm() {
@@ -513,6 +640,7 @@ Thank you for your business! 📦`;
             document.getElementById('tonnage').value = '';
             document.getElementById('intime').value = getCurrentDateTime();
             document.getElementById('outtime').value = getCurrentDateTime();
+            document.getElementById('driverPhone').value = '';
         }
 
         function exportData() {
@@ -521,9 +649,9 @@ Thank you for your business! 📦`;
                 return;
             }
 
-            let csv = 'Vehicle Number,Tonnage,Intime,Outtime,Status,WhatsApp Sent,Message ID\n';
+            let csv = 'Vehicle Number,Tonnage,Intime,Outtime,WhatsApp Status,Timestamp\n';
             vehicles.forEach(vehicle => {
-                csv += `"${vehicle.vehicleNumber}","${vehicle.tonnage}","${formatDateTime(vehicle.intime)}","${formatDateTime(vehicle.outtime)}","${vehicle.status}","${vehicle.whatsappSent || false}","${vehicle.whatsappMessageId || ''}"\n`;
+                csv += `"${vehicle.vehicleNumber}","${vehicle.tonnage}","${formatDateTime(vehicle.intime)}","${formatDateTime(vehicle.outtime)}","${vehicle.whatsappSent ? 'Sent (Simulated)' : 'Failed'}","${vehicle.timestamp}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -552,8 +680,11 @@ Thank you for your business! 📦`;
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
         }
 
-        // Initialize display on page load
+        // Initialize display
         updateDisplay();
+
+        // Auto-start WhatsApp automation on page load (optional)
+        // setTimeout(startWhatsAppAutomation, 1000);
     </script>
 </body>
 </html>
