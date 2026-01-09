@@ -3,170 +3,704 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sri Pydimamba Lorry Services - December 2025 Trips (Searchable by Vehicle)</title>
+    <title>Vehicle Data Extractor from PDF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { text-align: center; }
-        p { font-size: 1.1em; }
-        input#search { padding: 12px; width: 400px; font-size: 1em; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
-        th { background-color: #f0f0f0; position: sticky; top: 0; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        h1 i {
+            font-size: 2.8rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+            gap: 30px;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .results-section {
+            flex: 2;
+            min-width: 300px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #1a2980;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.3rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed #26d0ce;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            background-color: #f0fdfd;
+            border-color: #1a2980;
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: #26d0ce;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .upload-area p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(90deg, #1a2980, #26d0ce);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.2);
+        }
+        
+        .selected-file {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid #26d0ce;
+            display: none;
+        }
+        
+        .selected-file.active {
+            display: block;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .file-info i {
+            color: #1a2980;
+            font-size: 1.5rem;
+        }
+        
+        .extract-btn {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .extract-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+        
+        .extract-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #26d0ce;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .vehicle-table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        th {
+            background-color: #1a2980;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .vehicle-count {
+            background-color: #e8f5e9;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        
+        .vehicle-count span {
+            color: #1a2980;
+            font-size: 1.2rem;
+        }
+        
+        .export-btn {
+            background: linear-gradient(90deg, #FF512F, #DD2476);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(221, 36, 118, 0.3);
+        }
+        
+        .instructions {
+            background-color: #fff8e1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #ffb300;
+        }
+        
+        .instructions h3 {
+            color: #ff8f00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            color: #5d4037;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Sri Pydimamba Lorry Services - December 2025 Transport Bill (Detailed Trips)</h1>
-    <p>Use the search box below to filter by <strong>vehicle number</strong>. Type any part of the vehicle number (e.g., "1166" or "WE55") and the table will instantly show only the matching trips. Clear the box to see all trips.</p>
-    <input type="text" id="search" onkeyup="filterTable()" placeholder="Search by vehicle number...">
-
-    <table id="tripsTable">
-        <thead>
-            <tr>
-                <th>Sl No</th>
-                <th>Date</th>
-                <th>Vehicle No</th>
-                <th>Material</th>
-                <th>Unloading Location</th>
-                <th>Qty (MT)</th>
-                <th>Rate</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>1</td><td>1.12.2025</td><td>1166</td><td>40mm</td><td>svc & Co</td><td>51.44</td><td>230</td><td>11831.2</td></tr>
-            <tr><td>2</td><td>1.12.2025</td><td>1266</td><td>10mm</td><td>Rambilli KEC</td><td>46.67</td><td>260</td><td>12134.2</td></tr>
-            <tr><td>3</td><td>1.12.2025</td><td>WE5559</td><td>20mm</td><td>Afcons</td><td>33.34</td><td>230</td><td>7668.2</td></tr>
-            <tr><td>4</td><td>1.12.2025</td><td>7119</td><td>10mm</td><td>Afcons</td><td>35.66</td><td>230</td><td>8201.8</td></tr>
-            <tr><td>5</td><td>2.12.2025</td><td>7119</td><td>10mm</td><td>Afcons</td><td>35.46</td><td>230</td><td>8155.8</td></tr>
-            <tr><td>6</td><td>2.12.2025</td><td>3579</td><td>20mm</td><td>Afcons</td><td>36.2</td><td>230</td><td>8326</td></tr>
-            <tr><td>7</td><td>3.12.2025</td><td>3579</td><td>20mm</td><td>Afcons</td><td>35.16</td><td>230</td><td>8086.8</td></tr>
-            <tr><td>8</td><td>3.12.2025</td><td>8259</td><td>10mm</td><td>J S Mining</td><td>38.96</td><td>260</td><td>10129.6</td></tr>
-            <tr><td>9</td><td>4.12.2025</td><td>1949</td><td>10mm</td><td>Afcons</td><td>34.38</td><td>230</td><td>7907.4</td></tr>
-            <tr><td>10</td><td>4.12.2025</td><td>4919</td><td>20mm</td><td>Afcons</td><td>35.3</td><td>230</td><td>8119</td></tr>
-            <tr><td>11</td><td>4.12.2025</td><td>1949</td><td>10mm</td><td>Afcons</td><td>33.5</td><td>230</td><td>7705</td></tr>
-            <tr><td>12</td><td>4.12.2025</td><td>4919</td><td>20mm</td><td>Afcons</td><td>34.14</td><td>230</td><td>7852.2</td></tr>
-            <tr><td>13</td><td>4.12.2025</td><td>3389</td><td>20mm</td><td>Afcons</td><td>45.74</td><td>230</td><td>10520.2</td></tr>
-            <tr><td>14</td><td>5.12.2025</td><td>3579</td><td>20mm</td><td>Afcons</td><td>36.36</td><td>230</td><td>8362.8</td></tr>
-            <tr><td>15</td><td>5.12.2025</td><td>WE5559</td><td>10mm</td><td>Afcons</td><td>31.6</td><td>230</td><td>7268</td></tr>
-            <tr><td>16</td><td>5.12.2025</td><td>7119</td><td>10mm</td><td>Afcons</td><td>34.74</td><td>230</td><td>7990.2</td></tr>
-            <tr><td>17</td><td>5.12.2025</td><td>1266</td><td>20mm</td><td>Afcons</td><td>48.68</td><td>230</td><td>11196.4</td></tr>
-            <tr><td>18</td><td>5.12.2025</td><td>5226</td><td>10mm</td><td>Afcons</td><td>34.02</td><td>230</td><td>7824.6</td></tr>
-            <tr><td>19</td><td>5.12.2025</td><td>4919</td><td>10mm</td><td>Afcons</td><td>33.1</td><td>230</td><td>7613</td></tr>
-            <tr><td>20</td><td>5.12.2025</td><td>1949</td><td>10mm</td><td>Afcons</td><td>34.94</td><td>230</td><td>8036.2</td></tr>
-            <tr><td>21</td><td>6.12.2025</td><td>WE5559</td><td>20mm</td><td>Afcons</td><td>32.98</td><td>230</td><td>7585.4</td></tr>
-            <tr><td>22</td><td>6.12.2025</td><td>7119</td><td>20mm</td><td>Afcons</td><td>37.46</td><td>230</td><td>8615.8</td></tr>
-            <tr><td>23</td><td>6.12.2025</td><td>8259</td><td>20mm</td><td>Afcons</td><td>41.84</td><td>230</td><td>9623.2</td></tr>
-            <tr><td>24</td><td>6.12.2025</td><td>8259</td><td>35°OK35°</td><td>Tunglam to atpm plnt</td><td>16.2</td><td>-</td><td>12500</td></tr>
-            <tr><td>25</td><td>6.12.2025</td><td>7749</td><td>20mm</td><td>afcons</td><td>33.78</td><td>230</td><td>7769.4</td></tr>
-            <tr><td>26</td><td>6.12.2025</td><td>3579</td><td>20mm</td><td>Afcons</td><td>35.98</td><td>230</td><td>8275.4</td></tr>
-            <tr><td>27</td><td>6.12.2025</td><td>1688</td><td>Dust</td><td>NSC</td><td>44.26</td><td>210</td><td>9294.6</td></tr>
-            <tr><td>28</td><td>6.12.2025</td><td>1266</td><td>20mm</td><td>Afcons</td><td>48.68</td><td>230</td><td>11196.4</td></tr>
-            <tr><td>29</td><td>7.12.2025</td><td>8259</td><td>Dust</td><td>NSC</td><td>45.3</td><td>210</td><td>9513</td></tr>
-            <tr><td>30</td><td>7.12.2025</td><td>WE5559</td><td>Dust</td><td>NSC</td><td>36.2</td><td>210</td><td>7602</td></tr>
-            <tr><td>31</td><td>7.12.2025</td><td>7119</td><td>Dust</td><td>NSC</td><td>37.3</td><td>210</td><td>7833</td></tr>
-            <tr><td>32</td><td>7.12.2025</td><td>5226</td><td>Dust</td><td>NSC</td><td>39.92</td><td>210</td><td>8383.2</td></tr>
-            <tr><td>33</td><td>7.12.2025</td><td>7749</td><td>Dust</td><td>NSC</td><td>37.94</td><td>210</td><td>7967.4</td></tr>
-            <tr><td>34</td><td>8.12.2025</td><td>WE5559</td><td>Dust</td><td>NSC</td><td>37.17</td><td>210</td><td>7805.7</td></tr>
-            <tr><td>35</td><td>8.12.2025</td><td>8259</td><td>20mm</td><td>Afcons</td><td>44.96</td><td>230</td><td>10340.8</td></tr>
-            <tr><td>36</td><td>8.12.2025</td><td>5226</td><td>10mm</td><td>Afcons</td><td>32.96</td><td>230</td><td>7580.8</td></tr>
-            <tr><td>37</td><td>8.12.2025</td><td>2345</td><td>Msand</td><td>Pendurthi North star</td><td>38.52</td><td>180</td><td>6933.6</td></tr>
-            <tr><td>38</td><td>8.12.2025</td><td>UZ2345</td><td>20mm</td><td>Pendurthi North star</td><td>33.86</td><td>180</td><td>6094.8</td></tr>
-            <tr><td>39</td><td>8.12.2025</td><td>3389</td><td>Dust</td><td>NSC</td><td>45.92</td><td>210</td><td>9643.2</td></tr>
-            <tr><td>40</td><td>8.12.2025</td><td>7119</td><td>Dust</td><td>NSC</td><td>38.41</td><td>210</td><td>8066.1</td></tr>
-            <tr><td>41</td><td>8.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>46.46</td><td>210</td><td>9756.6</td></tr>
-            <tr><td>42</td><td>8.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>48.52</td><td>210</td><td>10189.2</td></tr>
-            <tr><td>43</td><td>8.12.2025</td><td>1688</td><td>Dust</td><td>Afcons</td><td>45.48</td><td>230</td><td>10460.4</td></tr>
-            <tr><td>44</td><td>9.12.2025</td><td>7749</td><td>20mm</td><td>ladhuravada North sta</td><td>33.82</td><td>260</td><td>8793.2</td></tr>
-            <tr><td>45</td><td>9.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>48.22</td><td>210</td><td>10126.2</td></tr>
-            <tr><td>46</td><td>9.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>42.38</td><td>210</td><td>8899.8</td></tr>
-            <tr><td>47</td><td>9.12.2025</td><td>1266</td><td>40mm</td><td>NSC</td><td>48.23</td><td>210</td><td>10128.3</td></tr>
-            <tr><td>48</td><td>9.12.2025</td><td>1166</td><td>Dust</td><td>NSC</td><td>42.58</td><td>210</td><td>8941.8</td></tr>
-            <tr><td>49</td><td>10.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>46.02</td><td>210</td><td>9664.2</td></tr>
-            <tr><td>50</td><td>10.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>44.1</td><td>210</td><td>9261</td></tr>
-            <tr><td>51</td><td>10.12.2025</td><td>8259</td><td>50mm</td><td>Siricon industries</td><td>42.24</td><td>230</td><td>9715.2</td></tr>
-            <tr><td>52</td><td>10.12.2025</td><td>WE5559</td><td>50mm</td><td>Siricon industries</td><td>31.86</td><td>230</td><td>7327.8</td></tr>
-            <tr><td>53</td><td>10.12.2025</td><td>1688</td><td>50mm</td><td>Siricon industries</td><td>44.6</td><td>230</td><td>10258</td></tr>
-            <tr><td>54</td><td>10.12.2025</td><td>7119</td><td>50mm</td><td>Siricon industries</td><td>33.52</td><td>230</td><td>7709.6</td></tr>
-            <tr><td>55</td><td>10.12.2025</td><td>5226</td><td>Dust</td><td>NSC</td><td>37.49</td><td>210</td><td>7872.9</td></tr>
-            <tr><td>56</td><td>10.12.2025</td><td>1266</td><td>Dust</td><td>NSC</td><td>53.76</td><td>210</td><td>11289.6</td></tr>
-            <tr><td>57</td><td>10.12.2025</td><td>1166</td><td>40mm</td><td>NSC</td><td>43.89</td><td>210</td><td>9216.9</td></tr>
-            <tr><td>58</td><td>11.12.2025</td><td>8259</td><td>10mm</td><td>Afcons</td><td>44.96</td><td>230</td><td>10340.8</td></tr>
-            <tr><td>59</td><td>11.12.2025</td><td>8259</td><td>Bags</td><td>Atchuthapuram</td><td>15.89</td><td></td><td>12500</td></tr>
-            <tr><td>60</td><td>11.12.2025</td><td>5226</td><td>Dust</td><td>Nsc</td><td>37.82</td><td>210</td><td>7942.2</td></tr>
-            <tr><td>61</td><td>11.12.2025</td><td>5999</td><td>Dust</td><td>Nsc</td><td>44.94</td><td>210</td><td>9437.4</td></tr>
-            <tr><td>62</td><td>11.12.2025</td><td>5999</td><td>Dust</td><td>Nsc</td><td>42.42</td><td>210</td><td>8908.2</td></tr>
-            <tr><td>63</td><td>11.12.2025</td><td>1688</td><td>Dust</td><td>Nsc</td><td>41.62</td><td>210</td><td>8740.2</td></tr>
-            <tr><td>64</td><td>14.12.2025</td><td>8259</td><td>50mm</td><td>Siricon industries</td><td>41.94</td><td>230</td><td>9646.2</td></tr>
-            <tr><td>65</td><td>14.12.2025</td><td>7119</td><td>50mm</td><td>Siricon industries</td><td>34.6</td><td>230</td><td>7958</td></tr>
-            <tr><td>66</td><td>14.12.2025</td><td>5226</td><td>50mm</td><td>Siricon industries</td><td>33.02</td><td>230</td><td>7594.6</td></tr>
-            <tr><td>67</td><td>14.12.2025</td><td>WE5559</td><td>50mm</td><td>Siricon industries</td><td>30.6</td><td>230</td><td>7038</td></tr>
-            <tr><td>68</td><td>16.12.2025</td><td>1688</td><td>10mm</td><td>Afcons</td><td>43.04</td><td>230</td><td>9899.2</td></tr>
-            <tr><td>69</td><td>16.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>43.82</td><td>155</td><td>6792.1</td></tr>
-            <tr><td>70</td><td>16.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>41.62</td><td>155</td><td>6451.1</td></tr>
-            <tr><td>71</td><td>16.12.2025</td><td>1949</td><td>50mm</td><td>K V Ramanareddy</td><td>32.88</td><td>155</td><td>5096.4</td></tr>
-            <tr><td>72</td><td>16.12.2025</td><td>1949</td><td>50mm</td><td>K V Ramanareddy</td><td>32.96</td><td>155</td><td>5108.8</td></tr>
-            <tr><td>73</td><td>16.12.2025</td><td>8259</td><td>10mm</td><td>Afcons</td><td>44.08</td><td>230</td><td>10138.4</td></tr>
-            <tr><td>74</td><td>16.12.2025</td><td>5226</td><td>10mm</td><td>Afcons</td><td>33.24</td><td>230</td><td>7645.2</td></tr>
-            <tr><td>75</td><td>16.12.2025</td><td>5226</td><td>20mm</td><td>Afcons</td><td>33.56</td><td>230</td><td>7718.8</td></tr>
-            <tr><td>76</td><td>16.12.2025</td><td>5226</td><td>50mm</td><td>K V Ramanareddy</td><td>33.4</td><td>155</td><td>5177</td></tr>
-            <tr><td>77</td><td>16.12.2025</td><td>5226</td><td>50mm</td><td>K V Ramanareddy</td><td>33.56</td><td>155</td><td>5201.8</td></tr>
-            <tr><td>78</td><td>16.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>45.74</td><td>210</td><td>9605.4</td></tr>
-            <tr><td>79</td><td>16.12.2025</td><td>5999</td><td>Dust</td><td>NSC</td><td>42.42</td><td>210</td><td>8908.2</td></tr>
-            <tr><td>80</td><td>16.12.2025</td><td>UZ2345</td><td>50mm</td><td>K V Ramanareddy</td><td>32.1</td><td>155</td><td>4975.5</td></tr>
-            <tr><td>81</td><td>16.12.2025</td><td>1266</td><td>20mm</td><td>Afcons</td><td>46.9</td><td>230</td><td>10787</td></tr>
-            <tr><td>82</td><td>16.12.2025</td><td>1166</td><td>50mm</td><td>K V Ramanareddy</td><td>43.72</td><td>155</td><td>6776.6</td></tr>
-            <tr><td>83</td><td>17.12.2025</td><td>UZ3335</td><td>50mm</td><td>K V Ramanareddy</td><td>43.88</td><td>155</td><td>6801.4</td></tr>
-            <tr><td>84</td><td>17.12.2025</td><td>UZ3335</td><td>50mm</td><td>K V Ramanareddy</td><td>44.4</td><td>155</td><td>6882</td></tr>
-            <tr><td>85</td><td>17.12.2025</td><td>UZ3335</td><td>50mm</td><td>K V Ramanareddy</td><td>43.46</td><td>155</td><td>6736.3</td></tr>
-            <tr><td>86</td><td>17.12.2025</td><td>UZ3335</td><td>50mm</td><td>K V Ramanareddy</td><td>43.92</td><td>155</td><td>6807.6</td></tr>
-            <tr><td>87</td><td>17.12.2025</td><td>5226</td><td>50mm</td><td>K V Ramanareddy</td><td>34.44</td><td>155</td><td>5338.2</td></tr>
-            <tr><td>88</td><td>17.12.2025</td><td>5226</td><td>50mm</td><td>K V Ramanareddy</td><td>34.02</td><td>155</td><td>5273.1</td></tr>
-            <tr><td>89</td><td>17.12.2025</td><td>1688</td><td>20mm</td><td>Afcons</td><td>44.16</td><td>230</td><td>10156.8</td></tr>
-            <tr><td>90</td><td>17.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>44.52</td><td>155</td><td>6900.6</td></tr>
-            <tr><td>91</td><td>17.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>43.76</td><td>155</td><td>6782.8</td></tr>
-            <tr><td>92</td><td>17.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>41.44</td><td>155</td><td>6423.2</td></tr>
-            <tr><td>93</td><td>17.12.2025</td><td>5999</td><td>20mm</td><td>Afcons</td><td>46.36</td><td>230</td><td>10662.8</td></tr>
-            <tr><td>94</td><td>17.12.2025</td><td>5999</td><td>50mm</td><td>K V Ramanareddy</td><td>40.34</td><td>155</td><td>6252.7</td></tr>
-            <tr><td>95</td><td>17.12.2025</td><td>2345</td><td>50mm</td><td>K V Ramanareddy</td><td>33.76</td><td>155</td><td>5232.8</td></tr>
-            <tr><td>96</td><td>17.12.2025</td><td>2345</td><td>50mm</td><td>K V Ramanareddy</td><td>35.24</td><td>155</td><td>5462.2</td></tr>
-            <tr><td>97</td><td>17.12.2025</td><td>WE2345</td><td>50mm</td><td>K V Ramanareddy</td><td>45.88</td><td>155</td><td>7111.4</td></tr>
-            <tr><td>98</td><td>17.12.2025</td><td>UZ2345</td><td>50mm</td><td>K V Ramanareddy</td><td>33.64</td><td>155</td><td>5214.2</td></tr>
-            <tr><td>99</td><td>17.12.2025</td><td>3579</td><td>50mm</td><td>K V Ramanareddy</td><td>34.96</td><td>155</td><td>5418.8</td></tr>
-            <tr><td>100</td><td>17.12.2025</td><td>1166</td><td>50mm</td><td>K V Ramanareddy</td><td>44.44</td><td>155</td><td>6888.2</td></tr>
-            <tr><td>101</td><td>17.12.2025</td><td>1166</td><td>50mm</td><td>K V Ramanareddy</td><td>45.06</td><td>155</td><td>6984.3</td></tr>
-            <tr><td>102</td><td>17.12.2025</td><td>1166</td><td>50mm</td><td>K V Ramanareddy</td><td>43.7</td><td>155</td><td>6773.5</td></tr>
-            <tr><td>103</td><td>17.12.2025</td><td>1166</td><td>50mm</td><td>K V Ramanareddy</td><td>43.82</td><td>155</td><td>6792.1</td></tr>
-            <tr><td>104</td><td>17.12.2025</td><td>3245</td><td>50mm</td><td>K V Ramanareddy</td><td>44.46</td><td>155</td><td>6891.3</td></tr>
-            <tr><td>105</td><td>18.12.2025</td><td>5999</td><td>50mm</td><td>Siricon industries</td><td>41.46</td><td>230</td><td>9535.8</td></tr>
-            <tr><td>106</td><td>18.12.2025</td><td>5999</td><td>50mm</td><td>Siricon industries</td><td>43.64</td><td>230</td><td>10037.2</td></tr>
-            <tr><td>107</td><td>26.12.2025</td><td>3335</td><td>50mm</td><td>K V Ramanareddy</td><td>39.06</td><td>155</td><td>6054.3</td></tr>
-            <tr><td>108</td><td>26.12.2025</td><td>3335</td><td>50mm</td><td>K V Ramanareddy</td><td>39.38</td><td>155</td><td>6103.9</td></tr>
-            <tr><td>109</td><td>26.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>42.56</td><td>155</td><td>6596.8</td></tr>
-            <tr><td>110</td><td>26.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>42.3</td><td>155</td><td>6556.5</td></tr>
-            <tr><td>111</td><td>26.12.2025</td><td>1688</td><td>50mm</td><td>K V Ramanareddy</td><td>42.7</td><td>155</td><td>6618.5</td></tr>
-            <tr><td>112</td><td>26.12.2025</td><td>4919</td><td>50mm</td><td>K V Ramanareddy</td><td>32.96</td><td>155</td><td>5108.8</td></tr>
-        </tbody>
-    </table>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-pdf"></i> Vehicle Data Extractor</h1>
+            <p class="subtitle">Upload a PDF containing vehicle information and extract data vehicle-wise. The tool will parse the document and organize vehicle details in a structured table.</p>
+        </header>
+        
+        <div class="main-content">
+            <section class="upload-section">
+                <h2 class="section-title"><i class="fas fa-upload"></i> Upload PDF</h2>
+                
+                <div class="upload-area" id="dropArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drag & Drop Your PDF File</h3>
+                    <p>or click to browse</p>
+                    <p>Supported format: PDF (max 10MB)</p>
+                    <input type="file" id="pdfInput" class="file-input" accept=".pdf">
+                    <button class="upload-btn" id="browseBtn"><i class="fas fa-folder-open"></i> Browse Files</button>
+                </div>
+                
+                <div class="selected-file" id="selectedFile">
+                    <div class="file-info">
+                        <i class="fas fa-file-pdf"></i>
+                        <div>
+                            <strong id="fileName">No file selected</strong>
+                            <p id="fileSize">-</p>
+                        </div>
+                    </div>
+                    <p id="fileStatus">Ready to extract data</p>
+                </div>
+                
+                <button class="extract-btn" id="extractBtn" disabled>
+                    <i class="fas fa-cogs"></i> Extract Vehicle Data
+                </button>
+                
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>Extracting vehicle data from PDF... This may take a moment.</p>
+                </div>
+            </section>
+            
+            <section class="results-section">
+                <h2 class="section-title"><i class="fas fa-table"></i> Extracted Vehicle Data</h2>
+                
+                <div class="vehicle-count" id="vehicleCount" style="display: none;">
+                    <span>Vehicles Found: <span id="countValue">0</span></span>
+                    <button class="export-btn" id="exportBtn"><i class="fas fa-download"></i> Export as CSV</button>
+                </div>
+                
+                <div class="vehicle-table-container">
+                    <div id="noDataMessage" class="no-data">
+                        <i class="fas fa-info-circle" style="font-size: 3rem; margin-bottom: 15px; color: #ccc;"></i>
+                        <p>Upload a PDF file and extract vehicle data to see results here.</p>
+                    </div>
+                    
+                    <table id="vehicleTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Vehicle ID</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Year</th>
+                                <th>Registration No.</th>
+                                <th>Owner</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTableBody">
+                            <!-- Vehicle data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-info-circle"></i> How to use this tool</h3>
+                    <ul>
+                        <li>Upload a PDF file containing vehicle information (like registration documents, fleet reports, etc.)</li>
+                        <li>Click "Extract Vehicle Data" to parse the document</li>
+                        <li>The extracted vehicle data will appear in the table above</li>
+                        <li>Export the data as CSV for further analysis</li>
+                        <li><strong>Note:</strong> This demo uses simulated data. In a real application, you would integrate with a PDF parsing library or backend service.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Vehicle Data Extractor Tool &copy; 2023 | For demonstration purposes only</p>
+            <p>Note: Actual PDF parsing requires a backend service or specialized JavaScript library</p>
+        </footer>
+    </div>
 
     <script>
-        function filterTable() {
-            let input = document.getElementById("search");
-            let filter = input.value.toUpperCase();
-            let table = document.getElementById("tripsTable");
-            let tr = table.getElementsByTagName("tr");
-            for (let i = 1; i < tr.length; i++) {  // Skip header row
-                let td = tr[i].getElementsByTagName("td")[2];  // Vehicle No column
-                if (td) {
-                    let txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
+        // DOM Elements
+        const pdfInput = document.getElementById('pdfInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const dropArea = document.getElementById('dropArea');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileStatus = document.getElementById('fileStatus');
+        const extractBtn = document.getElementById('extractBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const vehicleCount = document.getElementById('vehicleCount');
+        const countValue = document.getElementById('countValue');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const vehicleTable = document.getElementById('vehicleTable');
+        const vehicleTableBody = document.getElementById('vehicleTableBody');
+        const exportBtn = document.getElementById('exportBtn');
+        
+        // Event Listeners
+        browseBtn.addEventListener('click', () => pdfInput.click());
+        
+        pdfInput.addEventListener('change', handleFileSelect);
+        
+        extractBtn.addEventListener('click', extractVehicleData);
+        
+        exportBtn.addEventListener('click', exportToCSV);
+        
+        // Drag and drop functionality
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#1a2980';
+            dropArea.style.backgroundColor = '#f0fdfd';
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.borderColor = '#26d0ce';
+            dropArea.style.backgroundColor = 'white';
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#26d0ce';
+            dropArea.style.backgroundColor = 'white';
+            
+            if (e.dataTransfer.files.length) {
+                pdfInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+        
+        // Handle file selection
+        function handleFileSelect() {
+            if (pdfInput.files.length === 0) return;
+            
+            const file = pdfInput.files[0];
+            
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                alert('Please select a PDF file.');
+                return;
+            }
+            
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size exceeds 10MB limit.');
+                return;
+            }
+            
+            // Update UI with file info
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileStatus.textContent = 'Ready to extract data';
+            selectedFile.classList.add('active');
+            
+            // Enable extract button
+            extractBtn.disabled = false;
+            
+            // Reset results
+            resetResults();
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        // Reset results display
+        function resetResults() {
+            vehicleCount.style.display = 'none';
+            noDataMessage.style.display = 'block';
+            vehicleTable.style.display = 'none';
+            vehicleTableBody.innerHTML = '';
+        }
+        
+        // Simulate extracting vehicle data from PDF
+        function extractVehicleData() {
+            // Show loading indicator
+            loadingIndicator.classList.add('active');
+            extractBtn.disabled = true;
+            
+            // Simulate processing delay
+            setTimeout(() => {
+                // Generate sample vehicle data (in a real app, this would come from PDF parsing)
+                const vehicleData = generateSampleVehicleData();
+                
+                // Display the data
+                displayVehicleData(vehicleData);
+                
+                // Hide loading indicator
+                loadingIndicator.classList.remove('active');
+                extractBtn.disabled = false;
+            }, 1500);
+        }
+        
+        // Generate sample vehicle data for demonstration
+        function generateSampleVehicleData() {
+            const vehicleTypes = ['Sedan', 'SUV', 'Truck', 'Van', 'Motorcycle', 'Bus', 'Pickup'];
+            const vehicleModels = ['Toyota Camry', 'Honda Civic', 'Ford F-150', 'Chevrolet Silverado', 
+                                  'BMW X5', 'Mercedes-Benz C-Class', 'Tesla Model 3', 'Hyundai Tucson',
+                                  'Nissan Altima', 'Jeep Wrangler', 'Ram 1500', 'Subaru Outback'];
+            const owners = ['John Smith', 'ABC Transport Inc.', 'Jane Doe', 'XYZ Logistics', 
+                           'City Fleet Services', 'Robert Johnson', 'Global Delivery Co.', 'Mary Williams'];
+            const statuses = ['Active', 'In Service', 'Under Maintenance', 'Retired', 'Pending Inspection'];
+            
+            const vehicleCount = Math.floor(Math.random() * 15) + 5; // Random number between 5 and 20
+            const vehicles = [];
+            
+            for (let i = 1; i <= vehicleCount; i++) {
+                const type = vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
+                const model = vehicleModels[Math.floor(Math.random() * vehicleModels.length)];
+                const year = 2015 + Math.floor(Math.random() * 9); // 2015-2023
+                const regNo = generateRegistrationNumber();
+                const owner = owners[Math.floor(Math.random() * owners.length)];
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                
+                vehicles.push({
+                    id: `VH${String(i).padStart(3, '0')}`,
+                    type: type,
+                    model: model,
+                    year: year,
+                    registration: regNo,
+                    owner: owner,
+                    status: status
+                });
+            }
+            
+            return vehicles;
+        }
+        
+        // Generate a random registration number
+        function generateRegistrationNumber() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            
+            let regNo = '';
+            for (let i = 0; i < 3; i++) {
+                regNo += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+            regNo += '-';
+            for (let i = 0; i < 4; i++) {
+                regNo += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+            
+            return regNo;
+        }
+        
+        // Display vehicle data in the table
+        function displayVehicleData(vehicles) {
+            // Update count
+            countValue.textContent = vehicles.length;
+            vehicleCount.style.display = 'flex';
+            
+            // Clear table
+            vehicleTableBody.innerHTML = '';
+            
+            // Populate table
+            vehicles.forEach(vehicle => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${vehicle.id}</td>
+                    <td>${vehicle.type}</td>
+                    <td>${vehicle.model}</td>
+                    <td>${vehicle.year}</td>
+                    <td>${vehicle.registration}</td>
+                    <td>${vehicle.owner}</td>
+                    <td><span class="status-badge" style="background-color: ${getStatusColor(vehicle.status)}; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">${vehicle.status}</span></td>
+                `;
+                
+                vehicleTableBody.appendChild(row);
+            });
+            
+            // Show table and hide no data message
+            noDataMessage.style.display = 'none';
+            vehicleTable.style.display = 'table';
+        }
+        
+        // Get color based on status
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Active': return '#4caf50';
+                case 'In Service': return '#2196f3';
+                case 'Under Maintenance': return '#ff9800';
+                case 'Pending Inspection': return '#9c27b0';
+                case 'Retired': return '#f44336';
+                default: return '#757575';
             }
         }
+        
+        // Export data as CSV
+        function exportToCSV() {
+            const rows = document.querySelectorAll('#vehicleTable tbody tr');
+            if (rows.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Add headers
+            const headers = [];
+            document.querySelectorAll('#vehicleTable thead th').forEach(header => {
+                headers.push(header.textContent);
+            });
+            csvContent += headers.join(",") + "\n";
+            
+            // Add rows
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach((cell, index) => {
+                    // Remove HTML from status badge
+                    if (index === 6) {
+                        rowData.push(cell.textContent.trim());
+                    } else {
+                        rowData.push(cell.textContent);
+                    }
+                });
+                csvContent += rowData.join(",") + "\n";
+            });
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "vehicle_data.csv");
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Initialize with a sample message
+        window.addEventListener('DOMContentLoaded', () => {
+            fileStatus.textContent = 'No file selected yet';
+        });
     </script>
 </body>
 </html>
