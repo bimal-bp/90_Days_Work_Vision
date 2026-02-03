@@ -405,6 +405,14 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+      
+        .cumulative-totals {
+            background-color: #e8f5e8;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -813,11 +821,11 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="reuseKmr" class="form-label">Current KMR Reading</label>
-                                <input type="number" class="form-control" id="reuseKmr" min="0" readonly>
+                                <input type="number" class="form-control" id="reuseKmr" min="0">
                             </div>
                             <div class="col-md-6">
                                 <label for="reuseHmr" class="form-label">Current HMR Reading</label>
-                                <input type="number" class="form-control" id="reuseHmr" min="0" readonly>
+                                <input type="number" class="form-control" id="reuseHmr" min="0">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -1040,11 +1048,11 @@
                 showForm('selection');
             });
           
-            // Reuse tyre select change - auto-fill KMR/HMR
+            // Reuse tyre select change - auto-fill KMR/HMR with scrap tyre's close readings
             scrapTyreSelect.addEventListener('change', function() {
                 if (this.value) {
                     const tyreData = JSON.parse(this.value);
-                    // Use close KMR/HMR from scrap tyre as current readings
+                    // Use close KMR/HMR from scrap tyre as starting readings for reuse
                     reuseKmrInput.value = tyreData.close_kmr || tyreData.kmr || '';
                     reuseHmrInput.value = tyreData.close_hmr || tyreData.hmr || '';
                 } else {
@@ -1057,6 +1065,11 @@
             confirmReuseBtn.addEventListener('click', function() {
                 if (!scrapTyreSelect.value) {
                     alert('Please select a tyre to reuse');
+                    return;
+                }
+              
+                if (!reuseKmrInput.value || !reuseHmrInput.value) {
+                    alert('Please enter current KMR and HMR readings for the reused tyre');
                     return;
                 }
               
@@ -1164,15 +1177,21 @@
                         displayElement.textContent = data.current.tyreNumber;
                      
                         // Show status if tyre is from scrap
-                        if (data.current.scrapReason === 'reused' || data.current.previousHistory) {
+                        if (data.current.scrapReason === 'reused') {
                             statusElement.textContent = 'Reused';
                             statusElement.style.color = 'green';
+                        } else if (data.current.scrapReason === 'new') {
+                            statusElement.textContent = 'New';
+                            statusElement.style.color = 'blue';
+                        } else {
+                            statusElement.textContent = '';
                         }
                      
                         // Update visual state
                         positionElement.classList.remove('empty');
                      
-                        // Add blasted class if the reason was blast
+                        // Only add blasted class if the current tyre is actually blast
+                        // Remove red circles for new tyres
                         if (data.current.scrapReason === 'blast') {
                             positionElement.classList.add('blasted');
                         } else {
@@ -1199,12 +1218,21 @@
                     `;
                  
                     // Show current tyre details in modal
+                    let historyInfo = '';
+                    if (currentTyre.cumulative_kmr && currentTyre.cumulative_hmr) {
+                        historyInfo = `
+                            <div><strong>Cumulative KMR:</strong> ${currentTyre.cumulative_kmr}</div>
+                            <div><strong>Cumulative HMR:</strong> ${currentTyre.cumulative_hmr}</div>
+                        `;
+                    }
+                 
                     currentTyreDetailsDiv.innerHTML = `
                         <h6>Current Tyre Details</h6>
                         <div><strong>Tyre Number:</strong> ${currentTyre.tyreNumber}</div>
                         <div><strong>Issue Date:</strong> ${formatDate(currentTyre.issueDate)}</div>
                         <div><strong>KMR:</strong> ${currentTyre.kmr || 'N/A'}</div>
                         <div><strong>HMR:</strong> ${currentTyre.hmr || 'N/A'}</div>
+                        ${historyInfo}
                         ${currentTyre.scrapReason === 'reused' ? '<div><strong>Status:</strong> Reused from scrap</div>' : ''}
                     `;
                 } else {
@@ -1252,6 +1280,8 @@
                                 if (item.scrapReason === 'blast') blastCountVal++;
                                 if (item.scrapReason === 'puncture') punctureCountVal++;
                                 if (item.scrapReason === 'wear') wearCountVal++;
+                                if (item.scrapReason === 'damaged') wearCountVal++;
+                                if (item.scrapReason === 'other') wearCountVal++;
                             });
                         }
                     }
@@ -1279,8 +1309,34 @@
               
                 let scrapHTML = '';
                 scrapTyres.forEach(item => {
-                    const totalKmrRun = (item.close_kmr && item.kmr) ? (item.close_kmr - item.kmr) : 'N/A';
-                    const totalHmrRun = (item.close_hmr && item.hmr) ? (item.close_hmr - item.hmr) : 'N/A';
+                    // Calculate total run - considering cumulative if it exists
+                    let totalKmrRun = 'N/A';
+                    let totalHmrRun = 'N/A';
+                    
+                    if (item.cumulative_kmr && item.close_kmr && item.cumulative_kmr_start) {
+                        // If tyre had cumulative runs from previous reuse
+                        const lastRun = item.close_kmr - item.cumulative_kmr_start;
+                        totalKmrRun = item.cumulative_kmr + lastRun;
+                    } else if (item.cumulative_kmr) {
+                        // Just cumulative without this run
+                        totalKmrRun = item.cumulative_kmr;
+                    } else if (item.close_kmr && item.kmr) {
+                        // Regular run
+                        totalKmrRun = item.close_kmr - item.kmr;
+                    }
+                    
+                    if (item.cumulative_hmr && item.close_hmr && item.cumulative_hmr_start) {
+                        // If tyre had cumulative runs from previous reuse
+                        const lastRun = item.close_hmr - item.cumulative_hmr_start;
+                        totalHmrRun = item.cumulative_hmr + lastRun;
+                    } else if (item.cumulative_hmr) {
+                        // Just cumulative without this run
+                        totalHmrRun = item.cumulative_hmr;
+                    } else if (item.close_hmr && item.hmr) {
+                        // Regular run
+                        totalHmrRun = item.close_hmr - item.hmr;
+                    }
+                    
                     scrapHTML += `
                         <div class="scrap-item">
                             <div class="d-flex justify-content-between align-items-center">
@@ -1311,6 +1367,7 @@
                                     <div><strong>Total HMR Run:</strong> ${totalHmrRun}</div>
                                 </div>
                             </div>
+                            ${item.cumulative_kmr ? `<div class="cumulative-totals">Cumulative Total (including previous runs): KMR: ${item.cumulative_kmr} | HMR: ${item.cumulative_hmr}</div>` : ''}
                             ${item.notes ? `<div class="mt-2"><strong>Notes:</strong> ${item.notes}</div>` : ''}
                         </div>
                     `;
@@ -1406,6 +1463,38 @@
                     currentTyre.removalReason = scrapReasonSelect.value;
                     currentTyre.close_kmr = kmrInput.value ? parseInt(kmrInput.value) : null;
                     currentTyre.close_hmr = hmrInput.value ? parseInt(hmrInput.value) : null;
+                 
+                    // If this was a reused tyre, calculate cumulative totals
+                    if (currentTyre.cumulative_kmr && currentTyre.cumulative_hmr) {
+                        // Add the current run to cumulative totals
+                        const kmrRun = currentTyre.close_kmr ? (currentTyre.close_kmr - currentTyre.cumulative_kmr_start) : 0;
+                        const hmrRun = currentTyre.close_hmr ? (currentTyre.close_hmr - currentTyre.cumulative_hmr_start) : 0;
+                        currentTyre.cumulative_kmr += kmrRun;
+                        currentTyre.cumulative_hmr += hmrRun;
+                    } else if (currentTyre.scrapReason === 'reused' && currentTyre.previousHistory) {
+                        // Calculate cumulative from previous history
+                        let cumulativeKmr = 0;
+                        let cumulativeHmr = 0;
+                        
+                        // Get total from previous scrap
+                        if (currentTyre.previousHistory.cumulative_kmr && currentTyre.previousHistory.cumulative_hmr) {
+                            cumulativeKmr = currentTyre.previousHistory.cumulative_kmr;
+                            cumulativeHmr = currentTyre.previousHistory.cumulative_hmr;
+                        } else if (currentTyre.previousHistory.close_kmr && currentTyre.previousHistory.kmr) {
+                            cumulativeKmr = currentTyre.previousHistory.close_kmr - currentTyre.previousHistory.kmr;
+                            cumulativeHmr = currentTyre.previousHistory.close_hmr - currentTyre.previousHistory.hmr;
+                        }
+                        
+                        // Add this run to cumulative
+                        const kmrRun = currentTyre.close_kmr ? (currentTyre.close_kmr - currentTyre.kmr) : 0;
+                        const hmrRun = currentTyre.close_hmr ? (currentTyre.close_hmr - currentTyre.hmr) : 0;
+                        
+                        currentTyre.cumulative_kmr = cumulativeKmr + kmrRun;
+                        currentTyre.cumulative_hmr = cumulativeHmr + hmrRun;
+                        currentTyre.cumulative_kmr_start = currentTyre.kmr;
+                        currentTyre.cumulative_hmr_start = currentTyre.hmr;
+                    }
+                 
                     equipmentData[selectedPosition].history.unshift(currentTyre);
                 }
              
@@ -1605,6 +1694,20 @@
                     equipmentData[selectedPosition].history.unshift(currentTyre);
                 }
               
+                // Calculate cumulative totals from previous scrap
+                let cumulativeKmr = 0;
+                let cumulativeHmr = 0;
+                
+                if (selectedTyre.cumulative_kmr && selectedTyre.cumulative_hmr) {
+                    // Already has cumulative totals from previous reuse
+                    cumulativeKmr = selectedTyre.cumulative_kmr;
+                    cumulativeHmr = selectedTyre.cumulative_hmr;
+                } else if (selectedTyre.close_kmr && selectedTyre.kmr && selectedTyre.close_hmr && selectedTyre.hmr) {
+                    // Calculate from single run
+                    cumulativeKmr = selectedTyre.close_kmr - selectedTyre.kmr;
+                    cumulativeHmr = selectedTyre.close_hmr - selectedTyre.hmr;
+                }
+              
                 // Create reused tyre object
                 const reusedTyre = {
                     tyreNumber: selectedTyre.tyreNumber,
@@ -1613,6 +1716,10 @@
                     hmr: reuseHmrInput.value ? parseInt(reuseHmrInput.value) : null,
                     scrapReason: "reused",
                     notes: `Reused from scrap. ${reuseNotesInput.value}`,
+                    cumulative_kmr: cumulativeKmr,
+                    cumulative_hmr: cumulativeHmr,
+                    cumulative_kmr_start: reuseKmrInput.value ? parseInt(reuseKmrInput.value) : null,
+                    cumulative_hmr_start: reuseHmrInput.value ? parseInt(reuseHmrInput.value) : null,
                     previousHistory: selectedTyre
                 };
               
@@ -1621,9 +1728,6 @@
               
                 // Save to localStorage
                 saveEquipmentData(selectedEquipment, equipmentData);
-              
-                // Remove the tyre from scrap history
-                removeFromScrapHistory(selectedTyre);
               
                 // Update display
                 loadTyreData();
@@ -1829,8 +1933,27 @@
                                 // Skip reused tyres
                                 if (item.scrapReason === 'reused') return;
                               
-                                const totalKmrRun = (item.close_kmr && item.kmr) ? (item.close_kmr - item.kmr) : 'N/A';
-                                const totalHmrRun = (item.close_hmr && item.hmr) ? (item.close_hmr - item.hmr) : 'N/A';
+                                // Calculate total run - considering cumulative if it exists
+                                let totalKmrRun = 'N/A';
+                                let totalHmrRun = 'N/A';
+                                
+                                if (item.cumulative_kmr && item.close_kmr && item.cumulative_kmr_start) {
+                                    const lastRun = item.close_kmr - item.cumulative_kmr_start;
+                                    totalKmrRun = item.cumulative_kmr + lastRun;
+                                } else if (item.cumulative_kmr) {
+                                    totalKmrRun = item.cumulative_kmr;
+                                } else if (item.close_kmr && item.kmr) {
+                                    totalKmrRun = item.close_kmr - item.kmr;
+                                }
+                                
+                                if (item.cumulative_hmr && item.close_hmr && item.cumulative_hmr_start) {
+                                    const lastRun = item.close_hmr - item.cumulative_hmr_start;
+                                    totalHmrRun = item.cumulative_hmr + lastRun;
+                                } else if (item.cumulative_hmr) {
+                                    totalHmrRun = item.cumulative_hmr;
+                                } else if (item.close_hmr && item.hmr) {
+                                    totalHmrRun = item.close_hmr - item.hmr;
+                                }
                               
                                 scrapTyres.push({
                                     'Tyre Number': item.tyreNumber,
@@ -1845,6 +1968,8 @@
                                     'Close Date': formatDate(item.removalDate),
                                     'Total KMR Run': totalKmrRun,
                                     'Total HMR Run': totalHmrRun,
+                                    'Cumulative KMR': item.cumulative_kmr || 'N/A',
+                                    'Cumulative HMR': item.cumulative_hmr || 'N/A',
                                     'Notes': item.notes || ''
                                 });
                             });
